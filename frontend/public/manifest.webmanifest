@@ -1,0 +1,9 @@
+{
+  "name": "Ri'ayah",
+  "short_name": "Ri'ayah",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F2F7F8",
+  "theme_color": "#0E7490",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

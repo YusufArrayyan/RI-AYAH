@@ -1,0 +1,15 @@
+# Blueprint Render: satu web service Docker (frontend disajikan backend).
+# Di Render: New → Blueprint → pilih repo ini.
+services:
+  - type: web
+    name: riayah
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: RIAYAH_ENVIRONMENT
+        value: demo
+      - key: RIAYAH_JWT_SECRET
+        generateValue: true

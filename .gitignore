@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+backend/riayah.db
+backend/*.db
+backend/.keys/
+.env
+
+# Node
+frontend/node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Editor/OS
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Konfigurasi lokal Claude Code
+.claude/

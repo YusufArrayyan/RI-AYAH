@@ -1,0 +1,83 @@
+/* Token desain Ri'ayah — PRD Bab 14.2, dengan koreksi kontras (lihat DESIGN.md). */
+:root {
+  --primary: #0e7490;
+  --primary-hover: #0b6680;
+  --primary-dark: #155e75;
+  --primary-soft: #ddf0f5;
+  --on-primary: #ffffff;
+
+  --ink: #0f2a33;
+  --body: #3d5560;
+  --mute: #56707b;
+  --canvas: #f2f7f8;
+  --card: #ffffff;
+  --panel: #f7fafb;
+  --hairline: #cfdde2;
+  --line-strong: #76909a;
+
+  --ok: #1f7a4d;
+  --ok-soft: #ddf1e6;
+  --warn-fill: #f5c242;
+  --warn-text: #8a5a00;
+  --warn-soft: #fcf0cc;
+  --bad: #b42318;
+  --bad-hover: #9c1e14;
+  --bad-soft: #fbe1de;
+  --xai: #5b4b9a;
+  --xai-soft: #ece8f6;
+
+  --child-canvas: #fff6ea;
+  --child-accent: #c2560f;
+
+  --radius-chip: 9999px;
+  --radius-control: 10px;
+  --radius-card: 12px;
+  --radius-sheet: 16px;
+  --border: 1.5px solid var(--hairline);
+
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 20px;
+  --s6: 24px;
+  --s8: 32px;
+  --s10: 40px;
+  --s12: 48px;
+
+  --sidebar: 250px;
+  --content-max: 1090px;
+  --student-col: 640px;
+  --touch: 44px;
+  --bottom-nav-h: 64px;
+
+  --font-ui: "Atkinson Hyperlegible Next Variable", "Atkinson Hyperlegible", system-ui, Arial, sans-serif;
+  --font-child: "Baloo 2", "Atkinson Hyperlegible Next Variable", sans-serif;
+  --font-ar: "Amiri", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+
+  --ease: cubic-bezier(0.25, 1, 0.5, 1);
+  --t-fast: 150ms;
+  --t-base: 220ms;
+
+  --z-sticky: 10;
+  --z-drawer: 20;
+  --z-backdrop: 30;
+  --z-dialog: 40;
+  --z-toast: 50;
+
+  color-scheme: light;
+}
+
+/* Mode kontras tinggi (S6). */
+.hc {
+  --body: #1d343d;
+  --mute: #33505b;
+  --hairline: #6d8792;
+  --line-strong: #3d5560;
+  --canvas: #ffffff;
+  --panel: #ffffff;
+  --primary: #0a5a70;
+  --primary-hover: #084c5f;
+  --border: 2px solid var(--hairline);
+}
