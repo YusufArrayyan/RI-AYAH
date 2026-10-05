@@ -50,6 +50,8 @@ class User(Base):
     title: Mapped[str | None] = mapped_column(String(80))  # sapaan staf: "Bu Sari"
     institution_id: Mapped[int] = mapped_column(ForeignKey("institution.id"))
     active: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Akun staf hasil pendaftaran mandiri menunggu persetujuan admin sebelum bisa masuk.
+    pending_approval: Mapped[bool] = mapped_column(Boolean, default=False)
     is_coordinator: Mapped[bool] = mapped_column(Boolean, default=False)
     # khusus siswa
     nis: Mapped[str | None] = mapped_column(String(30), unique=True)

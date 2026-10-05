@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<title>Ri'ayah — Alur Aplikasi</title>
+<link rel="stylesheet" href="pdf.css" />
+</head>
+<body>
+
+<header class="cover">
+  <div>
+    <h1>Alur Aplikasi Ri'ayah</h1>
+    <p class="lead" style="margin-top:4pt">Cara kerja sistem, alur setiap peran, dan langkah uji, termasuk uji dengan data yang benar-benar baru.</p>
+    <p class="meta">Prototipe Lomba KSPI Al-Qolam 2026 · PRD Ri'ayah v2 · <a href="https://riayah.onrender.com">riayah.onrender.com</a> · <span class="sim">SIMULASI</span></p>
+  </div>
+  <div class="ar" lang="ar">رعاية</div>
+</header>
+
+<h2 style="margin-top:4pt">1. Ri'ayah dalam satu halaman</h2>
+<p>Ri'ayah membantu sekolah dan kampus <strong>menyapa siswa yang menunjukkan tanda awal tertekan</strong>, sebelum masalahnya terlihat di nilai. Sistem membaca empat indikator yang sudah dimiliki sekolah, yaitu kehadiran, aktivitas belajar daring, tugas terlambat, dan tren nilai kuis, ditambah check-in sukarela bila siswa setuju. Hasilnya satu dari tiga zona, dengan paling banyak tiga alasan dalam kalimat biasa. <strong>Manusia yang memutuskan langkah berikutnya.</strong></p>
+
+<div class="cols3">
+  <div class="box"><p><strong>Lapis 1 · Pembaca Tanda</strong></p><p>Mengubah data mingguan menjadi zona dan alasan yang bisa dibaca, plus saran “apa yang bisa mengubah penandaan ini”.</p></div>
+  <div class="box"><p><strong>Lapis 2 · Penolong Manusia</strong></p><p>Memastikan ada orang yang bertindak dalam batas waktu: wali kelas untuk kuning (7 hari), guru BK untuk merah (24 jam).</p></div>
+  <div class="box xai"><p><strong>Lapis 3 · Penjaga Amanah</strong></p><p>Persetujuan yang dapat ditarik, pemisahan data, log audit berantai, audit keadilan, dan komite etik.</p></div>
+</div>
+
+<h3>Tiga zona</h3>
+<table>
+  <thead><tr><th style="width:16%">Zona</th><th style="width:38%">Pemicu (aturan)</th><th style="width:20%">Siapa bertindak</th><th>Batas waktu</th></tr></thead>
+  <tbody>
+    <tr><td><span class="zone m">⬢ Merah</span></td><td><strong>M1</strong> · siswa menekan “Butuh bantuan sekarang” atau menjawab “ya” pada butir keselamatan check-in</td><td>Guru BK siaga</td><td>Kontak dalam 24 jam</td></tr>
+    <tr><td><span class="zone k">▲ Kuning</span></td><td><strong>K1</strong> · dua indikator atau lebih memburuk tiga pekan berturut-turut, atau <strong>K2</strong> · skor check-in ≥ ambang (hanya bila siswa ikut check-in)</td><td>Wali kelas atau dosen PA</td><td>Sapaan pribadi dalam 7 hari</td></tr>
+    <tr><td><span class="zone h">● Hijau</span></td><td>Tidak ada pemicu</td><td>—</td><td>Konten pustaka (pilihan)</td></tr>
+  </tbody>
+</table>
+<p style="font-size:8.5pt">Urutan evaluasi tetap: M1 → K1 → K2 → hijau. Tanda kuning dilepas (aturan <strong>L</strong>) bila indikator pemicu membaik dua pekan berturut-turut. Semua angka adalah usulan yang ditetapkan psikolog dan komite.</p>
+
+<h2>2. Alur ujung ke ujung</h2>
+<div class="flow">
+  <div class="node pri"><b>Persetujuan</b>Siswa (dan wali untuk anak) memilih data yang boleh dibaca · S2, W1</div>
+  <div class="arrow">→</div>
+  <div class="node"><b>Impor data</b>Admin unggah CSV; nomor induk dipseudonimkan, kolom terlarang dibuang · A1</div>
+  <div class="arrow">→</div>
+  <div class="node xai"><b>Mesin aturan</b>M1 → K1 → K2 → H; alasan dan kontrafaktual · A3, E4</div>
+  <div class="arrow">→</div>
+  <div class="node warn"><b>Zona dan kasus</b>Kuning ke wali kelas, merah ke BK, dengan batas waktu · G1, K1</div>
+  <div class="arrow">→</div>
+  <div class="node ok"><b>Manusia menyapa</b>Sapaan, sesi, rujukan; dicatat dengan kode hasil · G2, K2</div>
+  <div class="arrow">→</div>
+  <div class="node xai"><b>Pengawasan</b>Keberatan, hak data, keadilan, log audit · E1–E4</div>
+</div>
+<p>Di setiap titik, siswa tetap memegang kendali. Siswa bisa membaca alasan yang sama persis dengan yang dibaca guru (S3), menolak sapaan tanpa akibat, mengajukan keberatan yang ditinjau manusia, melihat siapa yang membuka datanya, dan menarik persetujuan kapan saja. Penarikan langsung menghentikan pemrosesan dan menutup kasus terbuka.</p>
+
+<h3>Status kasus</h3>
+<div class="flow">
+  <div class="node pri"><b>Baru</b>Kasus dibuat oleh aturan</div>
+  <div class="arrow">→</div>
+  <div class="node"><b>Disapa</b>Guru mencatat sapaan</div>
+  <div class="arrow">→</div>
+  <div class="node"><b>Ditindaklanjuti</b>Diteruskan ke BK, sesi, atau rujukan</div>
+  <div class="arrow">→</div>
+  <div class="node ok"><b>Ditutup</b>Dengan alasan dan jadwal tinjauan</div>
+</div>
+<p style="font-size:9pt">Cabang khusus: <strong>Terlambat</strong> bila belum disapa melewati batas (naik ke koordinator BK; pengingat di hari ke-5), dan <strong>Sedang ditinjau</strong> bila siswa mengajukan keberatan. Penarikan persetujuan menutup kasus dari status mana pun.</p>
+
+<h2 class="page-break">3. Alur setiap peran</h2>
+
+<h3>Siswa atau mahasiswa · ponsel</h3>
+<table>
+  <thead><tr><th style="width:9%">Layar</th><th style="width:22%">Nama</th><th>Yang terjadi</th></tr></thead>
+  <tbody>
+    <tr><td class="k">S1</td><td>Beranda</td><td>Sapaan, status check-in pekan ini, pesan dari wali kelas bila ada, bacaan. Tidak ada skor atau zona di beranda.</td></tr>
+    <tr><td class="k">S2</td><td>Persetujuan</td><td>Tiga langkah: tujuan → pilih data (saklar per jenis) → selesai. Panel “yang kami baca / yang tidak pernah kami baca”. Tombol “Nanti” setara dengan “Setuju”.</td></tr>
+    <tr><td class="k">S3</td><td>Mengapa saya ditandai</td><td>Zona (“bukan diagnosis”), maksimal 3 alasan dengan grafik tren, kotak XAI “apa yang bisa mengubah penandaan ini”, lalu tiga tanggapan: mau disapa, belum mau, atau “ini tidak sesuai” (keberatan).</td></tr>
+    <tr><td class="k">S4</td><td>Check-in</td><td>Empat pertanyaan singkat, satu per layar, semuanya boleh dilewati, plus butir keselamatan. Jawaban terenkripsi; tidak ada skor yang ditampilkan.</td></tr>
+    <tr><td class="k">S5</td><td>Pustaka</td><td>Bacaan dan latihan yang ditinjau BK, plus kontak bantuan yang sudah diverifikasi.</td></tr>
+    <tr><td class="k">S6</td><td>Privasi</td><td>Ubah izin, riwayat siapa membuka data, unduh salinan, minta perbaikan atau hapus, tarik semua persetujuan, mode kontras tinggi.</td></tr>
+    <tr><td class="k">S7</td><td>Bantuan sekarang</td><td>Selalu tersedia, juga saat offline atau setelah persetujuan ditarik. Membuka antrean merah BK, menampilkan jam layanan dan kontak darurat.</td></tr>
+    <tr><td class="k">S1-A / S3-A</td><td>Mode anak (SD)</td><td>Lima wajah perasaan; sapaan satu kalimat tanpa angka; pilihan Boleh, Aku belum mau, Itu tidak benar; jaminan “menolak tidak apa-apa, nilaimu tidak berubah”.</td></tr>
+  </tbody>
+</table>
+
+<div class="cols">
+  <div>
+    <h3>Orang tua atau wali · ponsel</h3>
+    <ul>
+      <li><strong>W1 Persetujuan:</strong> saklar per data, centang “saya wali sah”. Data anak baru dibaca bila wali setuju <em>dan</em> anak memberi asen.</li>
+      <li><strong>W2 Ringkasan:</strong> undangan guru BK dengan tiga pilihan waktu. Wali tidak pernah melihat zona atau alasan; BK yang menjelaskan.</li>
+      <li><strong>W3 Hak data anak:</strong> lihat, unduh, perbaiki, hapus, tarik izin, beserta status permintaan.</li>
+    </ul>
+    <h3>Guru wali kelas atau dosen PA</h3>
+    <ul>
+      <li><strong>G1 Daftar sapaan:</strong> hanya kuning dari kelas binaan, memakai kode siswa; nama baru tampil setelah kasus dibuka dan pembukaan itu tercatat.</li>
+      <li><strong>G2 Detail:</strong> alasan yang sama dengan yang dibaca siswa, daftar “yang tidak ditampilkan kepada Anda”, lalu langkah: catat sapaan (kode hasil saja), jadwalkan ulang, teruskan ke BK, atau laporkan tanda bahaya.</li>
+      <li><strong>G3 Panduan menyapa:</strong> kalimat yang dicoba dan yang dihindari.</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Guru BK atau konselor</h3>
+    <ul>
+      <li><strong>K1 Antrean:</strong> tab merah, kuning, dan selesai dengan sisa waktu; ambil kasus yang belum ditugaskan.</li>
+      <li><strong>K2 Detail:</strong> alasan lengkap dan angka per pekan, jawaban check-in (hanya bila siswa mengizinkan), catatan sesi terenkripsi, hubungi wali, rujuk, tutup.</li>
+      <li><strong>K3 Protokol krisis</strong> dan <strong>K4 Beban layanan</strong> (kapasitas per konselor, saran ambang ke admin).</li>
+    </ul>
+    <h3>Admin, pimpinan, komite</h3>
+    <ul>
+      <li><strong>A1–A4:</strong> impor data, pengguna dan relasi (persetujuan 4 mata), aturan dan estimator beban, kontak darurat dan pustaka.</li>
+      <li><strong>P1:</strong> dasbor agregat; kelompok di bawah 10 siswa disembunyikan.</li>
+      <li><strong>E1–E4:</strong> log audit dengan verifikasi rantai hash, keadilan antarkelompok, keberatan dan hak data, registri aturan dan uji XAI.</li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="page-break">4. Skenario demo untuk juri (sekitar 10 menit)</h2>
+<p>Kata sandi semua akun demo: <span class="mono">riayah-demo-2026</span>. Buka aplikasi 1–2 menit sebelum mulai agar server sudah bangun.</p>
+<ol class="steps">
+  <li><span class="who">Siswa</span> Masuk sebagai <span class="mono">nadia@demo.riayah.id</span>. Di beranda ada pesan dari Bu Sari → <strong>Lihat apa yang kami lihat</strong>. Tunjukkan zona “bukan diagnosis”, tiga alasan dengan grafik, dan kotak XAI kontrafaktual. Pilih <strong>Aku mau disapa</strong>.</li>
+  <li><span class="who">Mode anak</span> Keluar, masuk sebagai <span class="mono">alya@demo.riayah.id</span>. Tunjukkan wajah perasaan, lalu kartu “Mau cerita ke Pak Andi?”: satu kalimat tanpa angka dan tiga pilihan setara.</li>
+  <li><span class="who">Guru</span> Masuk sebagai <span class="mono">sari@demo.riayah.id</span>. Daftar memakai kode siswa tanpa skor. Buka kasus Nadia: siswa memilih “mau disapa”. Klik <strong>Catat sudah menyapa</strong> → pilih kode hasil → Simpan.</li>
+  <li><span class="who">BK</span> Masuk sebagai <span class="mono">rahman@demo.riayah.id</span>. Ada kasus merah belum ditugaskan → <strong>Ambil</strong> → Buka. Tunjukkan catatan terenkripsi dan keterangan bahwa pembukaan ini tercatat.</li>
+  <li><span class="who">Wali</span> Masuk sebagai <span class="mono">rina@demo.riayah.id</span>. Undangan BK untuk Alya → pilih waktu → Konfirmasi. Tunjukkan kotak “mengapa Anda tidak melihat zona”.</li>
+  <li><span class="who">Admin</span> Masuk sebagai <span class="mono">teguh@demo.riayah.id</span> → <strong>Aturan dan ambang</strong>. Ubah “pekan berturut-turut” K1 dari 3 ke 2: estimator langsung menghitung ulang beban dari data.</li>
+  <li><span class="who">Komite</span> Masuk sebagai <span class="mono">hasan@demo.riayah.id</span> → <strong>Log audit</strong> → <strong>Verifikasi rantai</strong> (rantai utuh). Buka <strong>Registri aturan dan XAI</strong>: empat uji penjelasan, lalu setujui usulan K2 v2.</li>
+  <li><span class="who">Siswa</span> Kembali ke Nadia → <strong>Privasi</strong>: riwayat “siapa yang melihat datamu” kini memuat Bu Sari. Akhiri dengan <strong>Tarik semua persetujuan</strong>: kasus ditutup, tetapi tombol bantuan tetap tersedia.</li>
+</ol>
+
+<h2 class="page-break">5. Uji dengan data baru (dari nol)</h2>
+<div class="box warn">
+  <p><strong>Lakukan dalam satu sesi.</strong> Di server gratis, database kembali ke kondisi awal setiap kali server tidur (15 menit tanpa pengunjung) atau di-deploy ulang, termasuk akun yang Anda daftarkan. Seluruh skenario di bawah butuh sekitar 10 menit.</p>
+</div>
+
+<h3>A. Jalur tercepat: mahasiswa (dewasa, tanpa wali)</h3>
+<ol class="steps">
+  <li><span class="who">Daftar</span> Di halaman masuk klik <strong>Daftar</strong> → <em>Siswa atau mahasiswa</em>. Isi nama, email baru, nomor induk (misalnya <span class="mono">MHS-2026-01</span>), jenjang <strong>Kampus</strong>, program studi, tanggal lahir, kata sandi minimal 8 karakter → <strong>Daftar</strong>. Anda langsung masuk ke halaman Persetujuan.</li>
+  <li><span class="who">Siswa</span> Di Persetujuan: <strong>Lanjut</strong> → nyalakan Kehadiran, Aktivitas belajar daring, Tugas terlambat, Nilai kuis → <strong>Setuju dan lanjut</strong>. Beranda menulis “Belum ada data mingguan dari sekolah”.</li>
+  <li><span class="who">Daftar</span> (Opsional) Buka jendela penyamaran, daftar sebagai <em>Guru wali kelas atau dosen PA</em>. Pesan yang muncul: menunggu persetujuan admin. Coba masuk: ditolak.</li>
+  <li><span class="who">Admin</span> Masuk sebagai <span class="mono">teguh@demo.riayah.id</span> → <strong>Pengguna dan relasi</strong>. Banner “akun baru menunggu persetujuan” → <strong>Lihat</strong> → <strong>Setujui</strong>. Guru baru kini bisa masuk.</li>
+  <li><span class="who">Admin</span> (Opsional, bila langkah 3 dilakukan) Di kartu <strong>Usulkan relasi</strong>: jenis <em>Dosen PA</em>, pilih guru baru dan mahasiswa baru → <strong>Ajukan</strong>. Keluar, masuk sebagai <span class="mono">ratna@demo.riayah.id</span> → Pengguna dan relasi → <strong>Setujui</strong>. Persetujuan 4 mata: Mas Teguh tidak bisa menyetujui usulannya sendiri.</li>
+  <li><span class="who">Admin</span> Masuk sebagai Mas Teguh → <strong>Impor data</strong> → di “Templat untuk siswa baru” klik <strong>Pola memburuk (memicu K1)</strong>. Berkas CSV terunduh berisi 8 pekan data untuk siswa yang baru mendaftar.</li>
+  <li><span class="who">Admin</span> <strong>Pilih berkas</strong> → unggah CSV tadi → periksa pemetaan kolom → <strong>Validasi</strong> → <strong>Impor 8 baris</strong>. Hasil: “1 penandaan baru masuk ke antrean guru atau BK”.</li>
+  <li><span class="who">Siswa</span> Masuk lagi sebagai mahasiswa baru. Beranda kini memuat pesan → buka <strong>Mengapa saya ditandai</strong>: tiga alasan (kehadiran, materi daring, tugas terlambat) dengan grafik dan saran kontrafaktual yang dihitung dari data Anda.</li>
+  <li><span class="who">Guru / BK</span> Bila relasi dibuat, guru baru melihat kasus ini di Daftar sapaan. Tanpa relasi, kasus muncul di antrean <strong>Kuning</strong> milik BK sebagai “Belum ditugaskan” (masuk sebagai <span class="mono">rahman@demo.riayah.id</span>).</li>
+  <li><span class="who">Keberatan</span> Sebagai mahasiswa, pilih <strong>Ini tidak sesuai</strong> dan tulis alasannya. Masuk sebagai <span class="mono">hasan@demo.riayah.id</span> → <strong>Hak data dan keberatan</strong> → pilih keberatan → <strong>Cabut penandaan</strong> dan tulis alasan. Penandaan mahasiswa langsung dilepas: layar S3-nya kini “Tidak ada penandaan”. Bila putusannya “Pertahankan”, alasan tertulis tampil di S3.</li>
+</ol>
+
+<h3>B. Jalur sekolah: siswa SD dengan wali</h3>
+<ol class="steps">
+  <li><span class="who">Daftar</span> Daftar sebagai siswa dengan jenjang <strong>SD</strong>. Akun otomatis memakai mode anak. Catat nomor induknya.</li>
+  <li><span class="who">Daftar</span> Daftar sebagai <em>Orang tua atau wali</em> dengan nomor induk anak tadi. Wali bisa masuk, tetapi layarnya menulis “menunggu verifikasi sekolah”.</li>
+  <li><span class="who">Admin</span> Mas Teguh → Pengguna dan relasi → relasi <em>Orang tua/wali</em> yang menunggu → <strong>Setujui</strong>.</li>
+  <li><span class="who">Wali</span> Masuk sebagai wali → <strong>Persetujuan</strong> → nyalakan data → centang “saya wali sah” → <strong>Setuju</strong>. Statusnya “menunggu asen anak”.</li>
+  <li><span class="who">Anak</span> Masuk sebagai siswa SD → <strong>Dataku</strong> → nyalakan saklar. Data kini dibaca karena wali dan anak sama-sama setuju.</li>
+  <li><span class="who">Admin</span> Impor templat <em>Pola memburuk</em> seperti jalur A. Siswa SD melihat sapaan versi anak: satu kalimat, tanpa zona dan angka.</li>
+</ol>
+
+<div class="box xai">
+  <p><span class="tag">XAI</span><strong>Yang dibuktikan skenario ini:</strong> zona tidak ditulis tangan. Mesin aturan membaca data yang Anda impor, memberi alasan yang sama untuk siswa dan guru, dan saran kontrafaktualnya benar-benar melepas tanda. Ini diuji otomatis dalam 192 uji backend, termasuk alur daftar sampai ditandai.</p>
+</div>
+
+<div class="foot">Ri'ayah bukan layanan darurat. Butir check-in, protokol krisis, dan panduan menyapa masih draf yang perlu ditinjau psikolog. Semua data di aplikasi adalah SIMULASI.</div>
+</body>
+</html>

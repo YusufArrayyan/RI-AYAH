@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from fastapi.testclient import TestClient  # noqa: E402
 
 from app.main import app  # noqa: E402
-from app.seed import reset_and_seed  # noqa: E402
+from app.seed import DEMO_PASSWORD, reset_and_seed  # noqa: E402
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -35,7 +35,7 @@ def client():
 
 
 def login(client, email: str) -> dict:
-    r = client.post("/api/auth/demo-login", json={"email": email})
+    r = client.post("/api/auth/login", json={"email": email, "password": DEMO_PASSWORD})
     assert r.status_code == 200, r.text
     return {"Authorization": f"Bearer {r.json()['token']}"}
 

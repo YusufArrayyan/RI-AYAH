@@ -39,11 +39,15 @@ npm install
 npm run dev
 ```
 
-Buka http://localhost:5173. Basis data SQLite dan data SIMULASI dibuat otomatis saat backend pertama kali jalan. Pada layar masuk, pilih salah satu akun demo; setiap peran hanya melihat layar miliknya.
+Buka http://localhost:5173. Basis data SQLite dan data SIMULASI dibuat otomatis saat backend pertama kali jalan. Masuk dengan salah satu akun uji, atau buat akun baru lewat **Daftar**. Setiap peran hanya melihat layar miliknya.
 
 Di Windows tersedia skrip `scripts/dev-api.cmd` (port 8010) dan `scripts/dev-web.cmd` (port 5180).
 
-**Kata sandi akun demo** (bila masuk lewat formulir email): `riayah-demo-2026`. Ini nilai uji untuk data SIMULASI, bukan kredensial produksi. Produksi memakai SSO (OIDC).
+**Akun uji:** daftar lengkap ada di [`docs/Ri-ayah-akun-uji.pdf`](docs/Ri-ayah-akun-uji.pdf). Semua memakai kata sandi `riayah-demo-2026`, nilai uji untuk data SIMULASI, bukan kredensial produksi. Produksi memakai SSO (OIDC).
+
+**Pendaftaran:** siswa/mahasiswa dan wali langsung bisa masuk; hubungan wali–anak diverifikasi admin. Peran staf (guru, BK, admin, pimpinan, komite) menunggu persetujuan admin di *Pengguna dan relasi*. Untuk memberi data ke siswa baru, admin memakai **Impor data → Templat untuk siswa baru**.
+
+**Dokumen:** [`docs/Ri-ayah-alur-aplikasi.pdf`](docs/Ri-ayah-alur-aplikasi.pdf) berisi alur sistem, alur setiap peran, skenario demo juri, dan langkah uji dengan data baru. Sumber HTML-nya di `docs/src/`.
 
 **Satu proses:** setelah `npm run build`, backend juga menyajikan `frontend/dist`, sehingga cukup menjalankan uvicorn lalu membuka http://localhost:8000.
 
@@ -74,11 +78,12 @@ cd backend
 python -m pytest -q
 ```
 
-182 uji mencakup kriteria penerimaan PRD Bab 14.4:
+193 uji mencakup kriteria penerimaan PRD Bab 14.4, ditambah alur masuk dan daftar:
 
 - **Tes peran:** setiap pasangan aktor dan objek data pada matriks Bab 3.2 (7 peran × 15 endpoint) terbukti diizinkan atau ditolak di sisi server.
 - **Tes penjelasan:** alasan yang tampil sama dengan aturan yang dijalankan, dan saran kontrafaktual benar-benar melepas tanda (termasuk 40 riwayat acak dengan indikator lain terus memburuk).
 - **Tes penarikan:** penarikan persetujuan menghentikan pemrosesan, menutup kasus, menjadwalkan penghapusan; tombol bantuan tetap bekerja.
+- **Tes daftar:** validasi isian, staf menunggu persetujuan, wali menunggu verifikasi hubungan, dan alur data baru dari daftar sampai ditandai.
 - Rantai audit mendeteksi entri yang diubah; membuka kasus menulis log sebelum data dikirim; mode anak tidak pernah menerima zona atau angka; kontak yang belum diverifikasi tersembunyi dari siswa.
 
 ## Aturan wajib PRD 14.3 dan penerapannya

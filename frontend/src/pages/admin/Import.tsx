@@ -123,9 +123,31 @@ export default function Import() {
                 </span>
               </label>
               <input id="csv" type="file" accept=".csv,text/csv" onChange={onFile} className="sr-only" />
-              <Button variant="ghost" icon={<Download aria-hidden />} onClick={() => download("/api/admin/import/sample", "contoh-impor-SIMULASI.csv")} style={{ alignSelf: "flex-start" }}>
-                Unduh contoh CSV (SIMULASI)
-              </Button>
+              <div className="row">
+                <Button variant="ghost" icon={<Download aria-hidden />} onClick={() => download("/api/admin/import/sample", "contoh-impor-SIMULASI.csv")}>
+                  Contoh CSV (dengan kolom terlarang)
+                </Button>
+              </div>
+              <div className="stack" style={{ gap: 8, paddingTop: 8, borderTop: "1px solid var(--hairline)" }}>
+                <h3 style={{ fontSize: 15.5 }}>Templat untuk siswa baru</h3>
+                <p className="small muted">Berisi 8 pekan data SIMULASI untuk semua siswa yang belum punya data mingguan, misalnya akun yang baru mendaftar.</p>
+                <div className="row">
+                  <Button
+                    variant="ghost"
+                    icon={<Download aria-hidden />}
+                    onClick={() => download("/api/admin/import/template?pattern=memburuk", "templat-memburuk-SIMULASI.csv").catch((e) => setErr(e.status === 404 ? "Semua siswa sudah punya data mingguan. Daftarkan siswa baru dulu." : e.message))}
+                  >
+                    Pola memburuk (memicu K1)
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    icon={<Download aria-hidden />}
+                    onClick={() => download("/api/admin/import/template?pattern=stabil", "templat-stabil-SIMULASI.csv").catch((e) => setErr(e.status === 404 ? "Semua siswa sudah punya data mingguan. Daftarkan siswa baru dulu." : e.message))}
+                  >
+                    Pola stabil
+                  </Button>
+                </div>
+              </div>
             </section>
             <aside className="stack">
               <SeenPanel

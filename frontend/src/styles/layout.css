@@ -609,6 +609,18 @@
     padding: var(--s12) var(--s8);
   }
 }
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+}
+@media (min-width: 1024px) {
+  .login-main {
+    justify-content: center;
+    min-height: 100dvh;
+  }
+}
+
 .role-grid {
   display: grid;
   gap: var(--s3);

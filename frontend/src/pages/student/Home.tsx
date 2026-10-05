@@ -10,7 +10,7 @@ import { initials } from "../../lib/format";
 export interface HomeData {
   nickname: string;
   mode: string;
-  week: number;
+  week: number | null;
   consent: { any: boolean; needs_reconfirm: boolean; guardian_pending: boolean };
   checkin: { consented: boolean; done: boolean };
   message: { case_id: number; from: string; text: string } | null;
@@ -54,7 +54,9 @@ export default function StudentHome() {
     <>
       <div className="m-greeting">
         <h1>Halo, {data.nickname}</h1>
-        <p className="muted">Data terakhir yang kamu izinkan: pekan ke-{data.week} semester ini.</p>
+        <p className="muted">
+          {data.week ? `Data terakhir dari sekolah: pekan ke-${data.week} semester ini.` : "Belum ada data mingguan dari sekolah. Kamu tetap bisa mengatur izin dan membaca pustaka."}
+        </p>
       </div>
 
       {data.consent.needs_reconfirm && (

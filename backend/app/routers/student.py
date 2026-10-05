@@ -138,9 +138,10 @@ def _consent_view(db: Session, user: User) -> dict:
     }
 
 
-def _teacher_title(db: Session, user: User, case: Case | None) -> str | None:
+def _teacher_title(db: Session, user: User, case: Case | None) -> str:
+    """Nama penyapa. Bila siswa belum punya wali kelas/dosen PA, kasus dipegang BK."""
     owner = db.get(User, case.owner_id) if case and case.owner_id else homeroom_teacher(db, user)
-    return owner.title if owner else None
+    return (owner.title or owner.nickname) if owner else "Guru BK"
 
 
 @router.get("/home")
@@ -159,10 +160,11 @@ def home(user: User = Depends(student_only), db: Session = Depends(get_db)):
         }
     picks = db.scalars(select(LibraryItem).where(LibraryItem.status == "terbit").order_by(LibraryItem.id).limit(3)).all()
     cv = _consent_view(db, user)
+    has_data = db.scalar(select(WeeklyIndicator.id).where(WeeklyIndicator.subject_id == s.id)) is not None
     return {
         "nickname": user.nickname,
         "mode": user.ui_mode,
-        "week": week,
+        "week": week if has_data else None,
         "consent": {
             "any": cv["any_granted"],
             "needs_reconfirm": cv["needs_reconfirm"],

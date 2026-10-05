@@ -142,7 +142,7 @@ function TeenFlag({ data, reload }: { data: FlagData; reload: () => Promise<void
           <ZoneChip zone={data.zone!} note="bukan diagnosis" />
         </div>
         <p className="small">
-          Sejak {fmtDate(data.flagged_at)}. {data.teacher}, wali kelasmu, melihat alasan yang sama dengan kalimat yang sama. Tidak ada versi rahasia.
+          Sejak {fmtDate(data.flagged_at)}. {data.teacher === "Guru BK" ? "Guru BK" : `${data.teacher}, wali kelasmu,`} melihat alasan yang sama dengan kalimat yang sama. Tidak ada versi rahasia.
         </p>
       </div>
 

@@ -1,4 +1,21 @@
+"""Masuk dan pendaftaran akun.
+
+Prototipe memakai akun email dan kata sandi. Produksi memakai SSO sekolah (OIDC) sehingga
+tidak ada kata sandi baru (PRD Bab 10.2); `current_user` tetap menjadi satu-satunya pintu.
+
+Aturan pendaftaran:
+- Siswa/mahasiswa langsung aktif. Data baru dibaca setelah persetujuan (S2), dan untuk siswa
+  di bawah 18 tahun juga setelah persetujuan wali.
+- Orang tua/wali langsung aktif, tetapi hubungan dengan anak berstatus menunggu verifikasi
+  sekolah (A2) sebelum wali melihat apa pun tentang anak.
+- Peran staf (guru, BK, admin, pimpinan, komite) menunggu persetujuan admin, karena peran
+  yang membuka akses ke data siswa tidak boleh mengaktifkan dirinya sendiri.
+"""
 from __future__ import annotations
+
+import re
+import secrets
+from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -6,22 +23,22 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .. import audit
-from ..access import needs_reconfirm
+from ..access import age_on, needs_reconfirm
 from ..config import settings
 from ..db import get_db
-from ..models import Institution, User
-from ..security import create_token, current_user, verify_password
+from ..models import Institution, KeyMapping, Relation, Subject, User
+from ..security import create_token, current_user, hash_password, verify_password
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+STAFF_ROLES = ("guru", "bk", "admin", "pimpinan", "komite")
+LEVELS = ("sd", "smp", "sma", "kampus")
 
 
 class LoginIn(BaseModel):
     email: str
     password: str
-
-
-class DemoIn(BaseModel):
-    email: str
 
 
 def user_json(db: Session, u: User) -> dict:
@@ -51,51 +68,112 @@ def _session(db: Session, u: User) -> dict:
 @router.post("/login")
 def login(body: LoginIn, db: Session = Depends(get_db)):
     u = db.scalar(select(User).where(User.email == body.email.strip().lower()))
-    if u is None or not u.active or not verify_password(body.password, u.password_hash):
+    if u is None or not verify_password(body.password, u.password_hash):
         raise HTTPException(401, "Email atau kata sandi tidak cocok")
+    if u.pending_approval:
+        raise HTTPException(403, "Akun Anda masih menunggu persetujuan admin sekolah.")
+    if not u.active:
+        raise HTTPException(403, "Akun ini dinonaktifkan. Hubungi admin sekolah.")
     return _session(db, u)
 
 
-DEMO_DESCRIPTIONS = {
-    "siswa": "Siswa atau mahasiswa · ponsel",
-    "wali": "Orang tua atau wali · ponsel",
-    "guru": "Guru wali kelas atau dosen PA · desktop",
-    "bk": "Guru BK atau konselor · desktop",
-    "admin": "Admin sekolah atau TI · desktop",
-    "pimpinan": "Pimpinan · desktop",
-    "komite": "Komite etik dan DPO · desktop",
-}
+class RegisterIn(BaseModel):
+    role: str
+    name: str
+    email: str
+    password: str
+    title: str | None = None  # sapaan staf, misalnya "Bu Rina"
+    # siswa
+    nis: str | None = None
+    level: str | None = None
+    class_name: str | None = None
+    birth_date: date | None = None
+    # wali
+    child_nis: str | None = None
 
 
-@router.get("/demo-accounts")
-def demo_accounts(db: Session = Depends(get_db)):
-    """Daftar akun SIMULASI untuk demo. Tidak tersedia di produksi."""
-    if settings.is_production:
-        raise HTTPException(404)
-    users = db.scalars(select(User).where(User.email.like("%@demo.riayah.id")).order_by(User.id)).all()
-    return [
-        {
-            "email": u.email,
-            "name": u.name,
-            "title": u.title,
-            "role": u.role,
-            "ui_mode": u.ui_mode,
-            "class_name": u.class_name,
-            "description": DEMO_DESCRIPTIONS[u.role],
-        }
-        for u in users
-    ]
+def _ui_mode(level: str) -> str:
+    return {"sd": "anak", "kampus": "kampus"}.get(level, "remaja")
 
 
-@router.post("/demo-login")
-def demo_login(body: DemoIn, db: Session = Depends(get_db)):
-    """Masuk tanpa kata sandi untuk akun SIMULASI. Produksi memakai SSO (OIDC)."""
-    if settings.is_production:
-        raise HTTPException(404)
-    u = db.scalar(select(User).where(User.email == body.email, User.email.like("%@demo.riayah.id")))
-    if u is None or not u.active:
-        raise HTTPException(404, "Akun demo tidak ditemukan")
-    return _session(db, u)
+@router.post("/register", status_code=201)
+def register(body: RegisterIn, db: Session = Depends(get_db)):
+    role = body.role
+    if role not in ("siswa", "wali", *STAFF_ROLES):
+        raise HTTPException(422, "Peran tidak dikenal")
+    name = " ".join(body.name.split())
+    email = body.email.strip().lower()
+    if len(name) < 3:
+        raise HTTPException(422, "Nama lengkap minimal 3 huruf")
+    if not EMAIL_RE.match(email):
+        raise HTTPException(422, "Format email tidak valid")
+    if len(body.password) < 8:
+        raise HTTPException(422, "Kata sandi minimal 8 karakter")
+    if db.scalar(select(User.id).where(User.email == email)):
+        raise HTTPException(409, "Email ini sudah terdaftar. Silakan masuk.")
+    inst = db.scalar(select(Institution).order_by(Institution.id))
+    if inst is None:
+        raise HTTPException(500, "Institusi belum disiapkan")
+
+    nickname = name.split(" ")[0]
+    u = User(
+        email=email,
+        password_hash=hash_password(body.password),
+        name=name,
+        nickname=nickname,
+        role=role,
+        institution_id=inst.id,
+        title=(body.title or "").strip() or (None if role in ("siswa",) else nickname),
+    )
+
+    if role == "siswa":
+        nis = (body.nis or "").strip().upper()
+        if not re.fullmatch(r"[A-Z0-9\-]{3,30}", nis):
+            raise HTTPException(422, "Nomor induk 3–30 karakter: huruf, angka, atau tanda hubung")
+        if db.scalar(select(User.id).where(User.nis == nis)):
+            raise HTTPException(409, "Nomor induk ini sudah terdaftar")
+        if body.level not in LEVELS:
+            raise HTTPException(422, "Pilih jenjang: SD, SMP, SMA, atau kampus")
+        if not (body.class_name or "").strip():
+            raise HTTPException(422, "Isi kelas atau program studi")
+        if body.birth_date is None:
+            raise HTTPException(422, "Isi tanggal lahir")
+        a = age_on(body.birth_date)
+        if a is None or a < 5 or a > 80 or body.birth_date > date.today():
+            raise HTTPException(422, "Tanggal lahir tidak masuk akal")
+        u.nis, u.level, u.class_name = nis, body.level, body.class_name.strip()
+        u.birth_date, u.ui_mode = body.birth_date, _ui_mode(body.level)
+
+    child = None
+    if role == "wali":
+        child = db.scalar(select(User).where(User.nis == (body.child_nis or "").strip().upper(), User.role == "siswa"))
+        if child is None:
+            raise HTTPException(422, "Nomor induk anak tidak ditemukan. Pastikan anak sudah terdaftar.")
+
+    if role in STAFF_ROLES:
+        u.pending_approval = True
+
+    db.add(u)
+    db.flush()
+
+    if role == "siswa":
+        while True:
+            code = "S-" + secrets.token_hex(2).upper()
+            if not db.scalar(select(Subject.id).where(Subject.code == code)):
+                break
+        s = Subject(code=code, class_name=u.class_name, level=u.level)
+        db.add(s)
+        db.flush()
+        db.add(KeyMapping(user_id=u.id, subject_id=s.id))
+    if child is not None:
+        db.add(Relation(actor_id=u.id, student_id=child.id, kind="wali", status="menunggu_verifikasi"))
+
+    audit.write(db, u, "daftar_akun", "pengguna", u.id, role, commit=False)
+    db.commit()
+
+    if u.pending_approval:
+        return {"pending": True, "message": "Pendaftaran terkirim. Admin sekolah perlu menyetujui akun Anda sebelum bisa masuk."}
+    return {"pending": False, **_session(db, u)}
 
 
 @router.get("/me")

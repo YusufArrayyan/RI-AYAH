@@ -73,8 +73,16 @@ def week_start(w: int) -> date:
     return monday - timedelta(weeks=WEEKS - w + 1)
 
 
+_USED_CODES: set[str] = set()
+
+
 def code() -> str:
-    return "S-" + secrets.token_hex(2).upper()
+    """Kode siswa acak yang dijamin unik dalam satu seed (4 hex bisa bertabrakan)."""
+    while True:
+        c = "S-" + secrets.token_hex(2).upper()
+        if c not in _USED_CODES:
+            _USED_CODES.add(c)
+            return c
 
 
 _HASHES: dict[str, str] = {}
@@ -145,6 +153,7 @@ def grant(db: Session, student: User, actor: User, types: list[str], kind: str, 
 
 
 def seed(db: Session) -> None:
+    _USED_CODES.clear()
     now = utcnow()
     inst = Institution(name="Sekolah Terpadu Nusantara (SIMULASI)", kind="sekolah")
     db.add(inst)

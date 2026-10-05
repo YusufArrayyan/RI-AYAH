@@ -5,6 +5,7 @@ import { GuardianShell, StaffShell, StudentShell } from "./layouts/Shells";
 import { AuthProvider, ROLE_HOME, useAuth, type Role } from "./lib/auth";
 import { ToastProvider } from "./lib/toast";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 // Siswa
 const StudentHome = lazy(() => import("./pages/student/Home"));
@@ -70,6 +71,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/masuk" element={<Login />} />
+            <Route path="/daftar" element={<Register />} />
 
             <Route
               path="/siswa"

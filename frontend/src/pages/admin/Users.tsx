@@ -11,7 +11,7 @@ interface U {
   role: string;
   role_name: string;
   scope: string;
-  status: "aktif" | "nonaktif" | "menunggu";
+  status: "aktif" | "nonaktif" | "menunggu" | "menunggu_akun";
 }
 interface Rel {
   id: number;
@@ -38,7 +38,8 @@ const KIND_LABEL: Record<string, string> = { wali_kelas: "Wali kelas", dosen_pa:
 const STATUS: Record<string, [string, string]> = {
   aktif: ["Aktif", "chip-ok"],
   nonaktif: ["Nonaktif", "chip-neutral"],
-  menunggu: ["Menunggu verifikasi", "chip-warn"],
+  menunggu: ["Relasi menunggu", "chip-warn"],
+  menunggu_akun: ["Menunggu persetujuan", "chip-warn"],
   menunggu_verifikasi: ["Menunggu verifikasi", "chip-warn"],
   menunggu_persetujuan: ["Menunggu persetujuan 4 mata", "chip-warn"],
 };
@@ -52,7 +53,7 @@ export default function UsersPage() {
     const t = setTimeout(() => setDq(q), 250);
     return () => clearTimeout(t);
   }, [q]);
-  const users = useResource<{ users: U[]; counts: Record<string, number> }>(`/api/admin/users?role=${role}&q=${encodeURIComponent(dq)}`);
+  const users = useResource<{ users: U[]; counts: Record<string, number>; pending_accounts: number }>(`/api/admin/users?role=${role}&q=${encodeURIComponent(dq)}`);
   const rels = useResource<{ relations: Rel[]; me: number }>("/api/admin/relations");
   const students = useResource<{ users: U[] }>("/api/admin/users?role=siswa");
   const staff = useResource<{ users: U[] }>("/api/admin/users");
@@ -63,6 +64,8 @@ export default function UsersPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [newU, setNewU] = useState({ name: "", email: "", role: "guru", class_name: "" });
   const [rel, setRel] = useState({ actor_id: "", student_id: "", kind: "wali_kelas" });
+  const [temp, setTemp] = useState<{ email: string; password: string } | null>(null);
+  const [onlyPending, setOnlyPending] = useState(false);
 
   const pending = (rels.data?.relations ?? []).filter((r) => r.status.startsWith("menunggu"));
   const actorRole = { wali_kelas: "guru", dosen_pa: "guru", bk: "bk", wali: "wali" }[rel.kind];
@@ -100,7 +103,8 @@ export default function UsersPage() {
     setBusy("add");
     setErr(null);
     try {
-      await api("/api/admin/users", { method: "POST", json: { ...newU, class_name: newU.class_name || null } });
+      const r = await api<{ temp_password: string }>("/api/admin/users", { method: "POST", json: { ...newU, class_name: newU.class_name || null } });
+      setTemp({ email: newU.email, password: r.temp_password });
       toast("Pengguna ditambahkan.");
       setAddOpen(false);
       setNewU({ name: "", email: "", role: "guru", class_name: "" });
@@ -116,8 +120,9 @@ export default function UsersPage() {
     if (!deact) return;
     setBusy("deact");
     try {
-      await api(`/api/admin/users/${deact.id}`, { method: "PATCH", json: { active: deact.status === "nonaktif" } });
-      toast(deact.status === "nonaktif" ? "Pengguna diaktifkan." : "Pengguna dinonaktifkan.");
+      const activate = deact.status === "nonaktif" || deact.status === "menunggu_akun";
+      await api(`/api/admin/users/${deact.id}`, { method: "PATCH", json: { active: activate } });
+      toast(deact.status === "menunggu_akun" ? "Akun disetujui. Pengguna sekarang bisa masuk." : activate ? "Pengguna diaktifkan." : "Pengguna dinonaktifkan.");
       setDeact(null);
       users.reload();
     } catch (e) {
@@ -141,6 +146,18 @@ export default function UsersPage() {
       />
       {err && <Banner kind="bad">{err}</Banner>}
       <div className="stack" style={{ gap: 20 }}>
+        {(users.data?.pending_accounts ?? 0) > 0 && (
+          <Banner
+            kind="warn"
+            action={
+              <Button size="sm" variant="ghost" onClick={() => setOnlyPending((v) => !v)}>
+                {onlyPending ? "Tampilkan semua" : "Lihat"}
+              </Button>
+            }
+          >
+            <strong>{users.data?.pending_accounts} akun baru</strong> menunggu persetujuan. Periksa peran dan email sebelum menyetujui.
+          </Banner>
+        )}
         {pending.length > 0 && (
           <section className="card stack" aria-labelledby="pend">
             <h2 id="pend">Menunggu persetujuan ({pending.length})</h2>
@@ -213,7 +230,7 @@ export default function UsersPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {users.data.users.map((u) => (
+                    {users.data.users.filter((u) => !onlyPending || u.status === "menunggu_akun").map((u) => (
                       <tr key={u.id}>
                         <td data-label="Nama" className="cell-main">
                           {u.name}
@@ -229,8 +246,8 @@ export default function UsersPage() {
                           <span className={`chip ${STATUS[u.status][1]}`}>{STATUS[u.status][0]}</span>
                         </td>
                         <td className="actions">
-                          <Button size="sm" variant={u.status === "nonaktif" ? "ghost" : "quiet"} onClick={() => setDeact(u)}>
-                            {u.status === "nonaktif" ? "Aktifkan" : "Nonaktifkan"}
+                          <Button size="sm" variant={u.status === "menunggu_akun" ? "primary" : u.status === "nonaktif" ? "ghost" : "quiet"} onClick={() => setDeact(u)}>
+                            {u.status === "menunggu_akun" ? "Setujui" : u.status === "nonaktif" ? "Aktifkan" : "Nonaktifkan"}
                           </Button>
                         </td>
                       </tr>
@@ -300,15 +317,41 @@ export default function UsersPage() {
 
       <ConfirmDialog
         open={!!deact}
-        title={deact?.status === "nonaktif" ? "Aktifkan pengguna?" : "Nonaktifkan pengguna?"}
-        consequence={deact?.status === "nonaktif" ? `${deact?.name} dapat masuk kembali.` : `${deact?.name} tidak dapat masuk lagi. Relasi dan riwayatnya tetap tercatat.`}
-        confirmLabel={deact?.status === "nonaktif" ? "Aktifkan" : "Nonaktifkan"}
-        danger={deact?.status !== "nonaktif"}
+        title={deact?.status === "menunggu_akun" ? "Setujui akun baru?" : deact?.status === "nonaktif" ? "Aktifkan pengguna?" : "Nonaktifkan pengguna?"}
+        consequence={
+          deact?.status === "menunggu_akun"
+            ? `${deact?.name} (${deact?.role_name}, ${deact?.email}) akan bisa masuk. Untuk guru, tambahkan relasi kelas binaan agar daftar sapaannya terisi.`
+            : deact?.status === "nonaktif"
+              ? `${deact?.name} dapat masuk kembali.`
+              : `${deact?.name} tidak dapat masuk lagi. Relasi dan riwayatnya tetap tercatat.`
+        }
+        confirmLabel={deact?.status === "menunggu_akun" ? "Setujui" : deact?.status === "nonaktif" ? "Aktifkan" : "Nonaktifkan"}
+        danger={deact?.status === "aktif" || deact?.status === "menunggu"}
         loading={busy === "deact"}
         onConfirm={deactivate}
         onCancel={() => setDeact(null)}
       />
-      <ConfirmDialog open={addOpen} title="Tambah pengguna" consequence="Pengguna masuk memakai SSO sekolah. Tidak ada kata sandi baru yang dibuat." confirmLabel="Tambah" loading={busy === "add"} onConfirm={addUser} onCancel={() => setAddOpen(false)}>
+      <ConfirmDialog
+        open={!!temp}
+        title="Akun dibuat"
+        consequence="Berikan kata sandi sementara ini kepada pengguna secara langsung. Kata sandi hanya ditampilkan sekali."
+        confirmLabel="Selesai"
+        cancelLabel="Salin"
+        onConfirm={() => setTemp(null)}
+        onCancel={() => {
+          if (temp) navigator.clipboard?.writeText(temp.password).then(() => toast("Kata sandi disalin."), () => {});
+        }}
+      >
+        <dl className="dl">
+          <dt>Email</dt>
+          <dd>{temp?.email}</dd>
+          <dt>Kata sandi</dt>
+          <dd className="mono" translate="no">
+            {temp?.password}
+          </dd>
+        </dl>
+      </ConfirmDialog>
+      <ConfirmDialog open={addOpen} title="Tambah pengguna" consequence="Sistem membuat kata sandi sementara yang ditampilkan sekali. Di sekolah, pengguna masuk memakai SSO." confirmLabel="Tambah" loading={busy === "add"} onConfirm={addUser} onCancel={() => setAddOpen(false)}>
         <div className="field">
           <label className="label" htmlFor="nn">
             Nama lengkap

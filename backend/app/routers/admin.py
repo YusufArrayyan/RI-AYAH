@@ -134,6 +134,34 @@ def import_sample(user: User = Depends(admin_only)):
     return PlainTextResponse(SAMPLE_CSV, headers={"Content-Disposition": 'attachment; filename="contoh-impor-SIMULASI.csv"'})
 
 
+@router.get("/import/template", response_class=PlainTextResponse)
+def import_template(pattern: str = "memburuk", user: User = Depends(admin_only), db: Session = Depends(get_db)):
+    """Templat CSV untuk siswa yang belum punya data mingguan (misalnya baru mendaftar).
+
+    pola "memburuk": stabil 5 pekan lalu kehadiran dan buka materi turun 3 pekan
+    (cukup untuk memicu K1). pola "stabil": tidak ada perubahan berarti. Semua SIMULASI.
+    """
+    if pattern not in ("memburuk", "stabil"):
+        raise HTTPException(422, "Pola tidak dikenal")
+    have = set(db.scalars(select(WeeklyIndicator.subject_id).distinct()))
+    students = []
+    for u in db.scalars(select(User).where(User.role == "siswa", User.nis.is_not(None)).order_by(User.id)):
+        s = subject_for(db, u)
+        if s is not None and s.id not in have:
+            students.append(u)
+    rows = ["nis,pekan,kehadiran,akses_lms,tugas_terlambat,nilai_kuis"]
+    for u in students:
+        for w in range(1, 9):
+            if pattern == "memburuk" and w >= 6:
+                k, lms, t = 5 - (w - 5), 12 - 3 * (w - 5), w - 5
+            else:
+                k, lms, t = 5, 12 + (w % 2), 0
+            rows.append(f"{u.nis},{w},{k},{lms},{t},{80 + (w % 3)}")
+    if len(rows) == 1:
+        raise HTTPException(404, "Semua siswa sudah memiliki data mingguan. Daftarkan siswa baru dulu.")
+    return PlainTextResponse("\n".join(rows) + "\n", headers={"Content-Disposition": f'attachment; filename="templat-{pattern}-SIMULASI.csv"'})
+
+
 @router.post("/import/preview")
 async def import_preview(
     file: UploadFile = File(...),
@@ -231,6 +259,7 @@ def users(role: str = "", q: str = "", user: User = Depends(admin_only), db: Ses
     rows = db.scalars(stmt.order_by(User.role, User.name).limit(200)).all()
     rels = db.scalars(select(Relation)).all()
     counts = {r: n for r, n in db.execute(select(User.role, func.count()).group_by(User.role))}
+    pending_accounts = db.scalar(select(func.count()).select_from(User).where(User.pending_approval.is_(True)))
     out = []
     for u in rows:
         mine = [r for r in rels if r.actor_id == u.id or r.student_id == u.id]
@@ -243,6 +272,12 @@ def users(role: str = "", q: str = "", user: User = Depends(admin_only), db: Ses
         elif u.role == "bk":
             scope = "Koordinator BK" if u.is_coordinator else "Kasus yang ditugaskan"
         pending = any(r.status in ("menunggu_verifikasi", "menunggu_persetujuan") for r in mine)
+        if u.pending_approval:
+            status = "menunggu_akun"
+        elif not u.active:
+            status = "nonaktif"
+        else:
+            status = "menunggu" if pending else "aktif"
         out.append(
             {
                 "id": u.id,
@@ -251,10 +286,10 @@ def users(role: str = "", q: str = "", user: User = Depends(admin_only), db: Ses
                 "role": u.role,
                 "role_name": ROLE_NAMES[u.role],
                 "scope": scope,
-                "status": "nonaktif" if not u.active else ("menunggu" if pending else "aktif"),
+                "status": status,
             }
         )
-    return {"users": out, "counts": counts}
+    return {"users": out, "counts": counts, "pending_accounts": pending_accounts}
 
 
 class UserIn(BaseModel):
@@ -275,12 +310,14 @@ def create_user(body: UserIn, user: User = Depends(admin_only), db: Session = De
         raise HTTPException(409, "Email sudah terdaftar")
     import secrets
 
+    temp_password = secrets.token_urlsafe(9)
     u = User(
         email=email,
-        password_hash=hash_password(secrets.token_urlsafe(16)),
+        password_hash=hash_password(temp_password),
         name=body.name.strip(),
         nickname=body.name.strip().split(" ")[0],
         role=body.role,
+        title=body.name.strip().split(" ")[0],
         institution_id=user.institution_id,
         class_name=body.class_name,
     )
@@ -288,7 +325,8 @@ def create_user(body: UserIn, user: User = Depends(admin_only), db: Session = De
     db.flush()
     audit.write(db, user, "tambah_pengguna", "pengguna", u.id, ROLE_NAMES[body.role], commit=False)
     db.commit()
-    return {"ok": True, "id": u.id}
+    # Kata sandi sementara ditampilkan sekali kepada admin; produksi memakai SSO.
+    return {"ok": True, "id": u.id, "temp_password": temp_password}
 
 
 class UserPatch(BaseModel):
@@ -302,8 +340,12 @@ def patch_user(uid: int, body: UserPatch, user: User = Depends(admin_only), db: 
         raise HTTPException(404, "Pengguna tidak ditemukan")
     if u.id == user.id:
         raise HTTPException(409, "Anda tidak dapat menonaktifkan akun sendiri")
+    was_pending = u.pending_approval
     u.active = body.active
-    audit.write(db, user, "ubah_status_pengguna", "pengguna", u.id, "aktif" if body.active else "nonaktif", commit=False)
+    if body.active:
+        u.pending_approval = False
+    action = "setujui_akun" if (was_pending and body.active) else "ubah_status_pengguna"
+    audit.write(db, user, action, "pengguna", u.id, "aktif" if body.active else "nonaktif", commit=False)
     db.commit()
     return {"ok": True}
 

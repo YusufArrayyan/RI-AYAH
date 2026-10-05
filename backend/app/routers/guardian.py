@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from .. import audit
 from ..access import consent_state, related_student_ids, require_guardian_of, subject_for
 from ..db import get_db
-from ..models import CheckinResponse, Consent, DataRequest, Invitation, User, WeeklyIndicator
+from ..models import CheckinResponse, Consent, DataRequest, Invitation, Relation, User, WeeklyIndicator
 from ..security import require_role
 from ..services import withdraw_all
 from ..timeutil import utcnow
@@ -65,6 +65,18 @@ def children(user: User = Depends(guardian_only), db: Session = Depends(get_db))
         out.append(
             {"id": s.id, "name": s.name, "nickname": s.nickname, "class_name": s.class_name, "level": s.level, "consent_status": cs["status"], "pending_invitations": pending}
         )
+    return out
+
+
+@router.get("/pending")
+def pending(user: User = Depends(guardian_only), db: Session = Depends(get_db)):
+    """Anak yang hubungannya belum diverifikasi sekolah. Hanya nama dan kelas."""
+    rels = db.scalars(select(Relation).where(Relation.actor_id == user.id, Relation.kind == "wali", Relation.status == "menunggu_verifikasi")).all()
+    out = []
+    for r in rels:
+        s = db.get(User, r.student_id)
+        if s:
+            out.append({"name": s.name, "class_name": s.class_name})
     return out
 
 

@@ -30,12 +30,17 @@ export default function GuardianSummary() {
   const kids = useChildren();
   const sid = kids.selected?.id;
   const sum = useResource<SummaryData>(sid ? `/api/guardian/children/${sid}/summary` : null);
+  const pending = useResource<{ name: string; class_name: string }[]>("/api/guardian/pending");
   if (kids.loading && !kids.data) return <LoadingBlock label="Memuat" />;
   if (kids.error && !kids.data) return <ErrorState error={kids.error} onRetry={kids.reload} />;
   if (!kids.data?.length)
     return (
       <div className="card">
-        <EmptyState title="Belum ada anak yang terhubung">Hubungi sekolah untuk memverifikasi hubungan Anda sebagai wali.</EmptyState>
+        <EmptyState title={pending.data?.length ? "Menunggu verifikasi sekolah" : "Belum ada anak yang terhubung"}>
+          {pending.data?.length
+            ? `Hubungan Anda dengan ${pending.data.map((p) => `${p.name} (${p.class_name})`).join(", ")} sedang diverifikasi admin sekolah. Setelah disetujui, persetujuan dan undangan BK muncul di sini.`
+            : "Hubungi sekolah untuk memverifikasi hubungan Anda sebagai wali."}
+        </EmptyState>
       </div>
     );
   const st = CONSENT_STATUS[kids.selected!.consent_status];
