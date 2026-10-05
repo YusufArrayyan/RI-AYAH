@@ -62,9 +62,9 @@ export default function UsersPage() {
   const [err, setErr] = useState<string | null>(null);
   const [deact, setDeact] = useState<U | null>(null);
   const [addOpen, setAddOpen] = useState(false);
-  const [newU, setNewU] = useState({ name: "", email: "", role: "guru", class_name: "" });
+  const [newU, setNewU] = useState({ name: "", email: "", role: "guru", class_name: "", nis: "", level: "sma", birth_date: "" });
   const [rel, setRel] = useState({ actor_id: "", student_id: "", kind: "wali_kelas" });
-  const [temp, setTemp] = useState<{ email: string; password: string } | null>(null);
+  const [temp, setTemp] = useState<{ email: string; password: string; label: string } | null>(null);
   const [onlyPending, setOnlyPending] = useState(false);
 
   const pending = (rels.data?.relations ?? []).filter((r) => r.status.startsWith("menunggu"));
@@ -103,11 +103,15 @@ export default function UsersPage() {
     setBusy("add");
     setErr(null);
     try {
-      const r = await api<{ temp_password: string }>("/api/admin/users", { method: "POST", json: { ...newU, class_name: newU.class_name || null } });
-      setTemp({ email: newU.email, password: r.temp_password });
+      const siswa = newU.role === "siswa";
+      const body = siswa
+        ? { name: newU.name, role: "siswa", email: newU.email, nis: newU.nis, level: newU.level, class_name: newU.class_name, birth_date: newU.birth_date || null }
+        : { name: newU.name, role: newU.role, email: newU.email };
+      const r = await api<{ temp_password?: string; activation_code?: string }>("/api/admin/users", { method: "POST", json: body });
+      setTemp(siswa ? { email: `NIS ${newU.nis.toUpperCase()}`, password: r.activation_code ?? "", label: "Kode aktivasi" } : { email: newU.email, password: r.temp_password ?? "", label: "Kata sandi sementara" });
       toast("Pengguna ditambahkan.");
       setAddOpen(false);
-      setNewU({ name: "", email: "", role: "guru", class_name: "" });
+      setNewU({ name: "", email: "", role: "guru", class_name: "", nis: "", level: "sma", birth_date: "" });
       users.reload();
       staff.reload();
     } catch (e) {
@@ -320,7 +324,7 @@ export default function UsersPage() {
         title={deact?.status === "menunggu_akun" ? "Setujui akun baru?" : deact?.status === "nonaktif" ? "Aktifkan pengguna?" : "Nonaktifkan pengguna?"}
         consequence={
           deact?.status === "menunggu_akun"
-            ? `${deact?.name} (${deact?.role_name}, ${deact?.email}) akan bisa masuk. Untuk guru, tambahkan relasi kelas binaan agar daftar sapaannya terisi.`
+            ? `${deact?.name} (${deact?.role_name}, ${deact?.email}) akan bisa masuk. Untuk guru, tambahkan relasi kelas binaan agar daftar siswanya terisi.`
             : deact?.status === "nonaktif"
               ? `${deact?.name} dapat masuk kembali.`
               : `${deact?.name} tidak dapat masuk lagi. Relasi dan riwayatnya tetap tercatat.`
@@ -334,7 +338,7 @@ export default function UsersPage() {
       <ConfirmDialog
         open={!!temp}
         title="Akun dibuat"
-        consequence="Berikan kata sandi sementara ini kepada pengguna secara langsung. Kata sandi hanya ditampilkan sekali."
+        consequence={temp?.label === "Kode aktivasi" ? "Berikan kode ini kepada siswa (atau cetak kartunya di Kode akses). Siswa membuat kata sandinya sendiri di halaman aktivasi." : "Berikan kata sandi sementara ini kepada pengguna secara langsung. Kata sandi hanya ditampilkan sekali."}
         confirmLabel="Selesai"
         cancelLabel="Salin"
         onConfirm={() => setTemp(null)}
@@ -343,15 +347,15 @@ export default function UsersPage() {
         }}
       >
         <dl className="dl">
-          <dt>Email</dt>
+          <dt>Akun</dt>
           <dd>{temp?.email}</dd>
-          <dt>Kata sandi</dt>
+          <dt>{temp?.label}</dt>
           <dd className="mono" translate="no">
             {temp?.password}
           </dd>
         </dl>
       </ConfirmDialog>
-      <ConfirmDialog open={addOpen} title="Tambah pengguna" consequence="Sistem membuat kata sandi sementara yang ditampilkan sekali. Di sekolah, pengguna masuk memakai SSO." confirmLabel="Tambah" loading={busy === "add"} onConfirm={addUser} onCancel={() => setAddOpen(false)}>
+      <ConfirmDialog open={addOpen} title="Tambah pengguna" consequence={newU.role === "siswa" ? "Sistem membuat kode aktivasi untuk siswa ini. Orang tua tidak ditambahkan di sini, tetapi lewat kode undangan di halaman Kode akses." : "Sistem membuat kata sandi sementara yang ditampilkan sekali. Di sekolah, pengguna masuk memakai SSO."} confirmLabel="Tambah" loading={busy === "add"} onConfirm={addUser} onCancel={() => setAddOpen(false)}>
         <div className="field">
           <label className="label" htmlFor="nn">
             Nama lengkap
@@ -360,7 +364,7 @@ export default function UsersPage() {
         </div>
         <div className="field">
           <label className="label" htmlFor="ne">
-            Email sekolah
+            Email sekolah {newU.role === "siswa" && <span className="muted">(boleh kosong)</span>}
           </label>
           <input id="ne" name="email" className="input" type="email" autoComplete="off" spellCheck={false} value={newU.email} onChange={(e) => setNewU({ ...newU, email: e.target.value })} />
         </div>
@@ -369,13 +373,50 @@ export default function UsersPage() {
             Peran
           </label>
           <select id="nr" className="select" value={newU.role} onChange={(e) => setNewU({ ...newU, role: e.target.value })}>
-            {ROLES.filter(([k]) => k).map(([k, l]) => (
+            {ROLES.filter(([k]) => k && k !== "wali").map(([k, l]) => (
               <option key={k} value={k}>
                 {l}
               </option>
             ))}
           </select>
         </div>
+        {newU.role === "siswa" && (
+          <>
+            <div className="grid-2">
+              <div className="field">
+                <label className="label" htmlFor="nnis">
+                  Nomor induk
+                </label>
+                <input id="nnis" className="input" autoComplete="off" value={newU.nis} onChange={(e) => setNewU({ ...newU, nis: e.target.value })} />
+              </div>
+              <div className="field">
+                <label className="label" htmlFor="nlevel">
+                  Jenjang
+                </label>
+                <select id="nlevel" className="select" value={newU.level} onChange={(e) => setNewU({ ...newU, level: e.target.value })}>
+                  <option value="sd">SD</option>
+                  <option value="smp">SMP</option>
+                  <option value="sma">SMA/SMK</option>
+                  <option value="kampus">Kampus</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid-2">
+              <div className="field">
+                <label className="label" htmlFor="nclass">
+                  Kelas
+                </label>
+                <input id="nclass" className="input" autoComplete="off" value={newU.class_name} onChange={(e) => setNewU({ ...newU, class_name: e.target.value })} />
+              </div>
+              <div className="field">
+                <label className="label" htmlFor="nbirth">
+                  Tanggal lahir
+                </label>
+                <input id="nbirth" className="input" type="date" value={newU.birth_date} onChange={(e) => setNewU({ ...newU, birth_date: e.target.value })} />
+              </div>
+            </div>
+          </>
+        )}
       </ConfirmDialog>
     </>
   );

@@ -149,7 +149,7 @@ export default function Import() {
               </div>
               <div className="stack" style={{ gap: 8, paddingTop: 8, borderTop: "1px solid var(--hairline)" }}>
                 <h3 style={{ fontSize: 15.5 }}>Templat untuk siswa baru</h3>
-                <p className="small muted">Berisi 8 pekan data SIMULASI untuk semua siswa yang belum punya data mingguan, misalnya akun yang baru mendaftar.</p>
+                <p className="small muted">Berisi 8 minggu data SIMULASI untuk semua siswa yang belum punya data mingguan, misalnya akun yang baru dibuat.</p>
                 <div className="row">
                   <Button
                     variant="ghost"
@@ -288,7 +288,7 @@ export default function Import() {
                     <thead>
                       <tr>
                         <th scope="col">Kode</th>
-                        <th scope="col">Pekan</th>
+                        <th scope="col">Minggu</th>
                         <th scope="col">Hadir</th>
                         <th scope="col">Buka materi</th>
                         <th scope="col">Tugas terlambat</th>
@@ -328,7 +328,7 @@ export default function Import() {
             <h2>Impor selesai</h2>
             <p>
               {result.rows_ok} baris masuk, {result.rows_bad} ditolak, {result.dropped.length} kolom dibuang. Aturan dijalankan ulang:{" "}
-              {result.new_cases ? `${result.new_cases} penandaan baru masuk ke antrean guru atau BK.` : "tidak ada penandaan baru."}
+              {result.new_cases ? `${result.new_cases} tanda baru masuk ke daftar guru atau BK.` : "tidak ada tanda baru."}
             </p>
             <Button variant="ghost" onClick={reset}>
               Impor berkas lain

@@ -381,7 +381,7 @@ def load(user: User = Depends(bk_only), db: Session = Depends(get_db)):
         "trend": trend,
         "over_threshold": two_weeks_high,
         "suggestion": (
-            "Beban di atas 85% selama dua pekan. Pertimbangkan menaikkan ambang K2 atau menambah konselor siaga. Kirim saran ke admin untuk dihitung di estimator."
+            "Beban di atas 85% selama dua minggu. Pertimbangkan menaikkan ambang K2 atau menambah konselor siaga. Kirim saran ke admin untuk dihitung di estimator."
             if two_weeks_high
             else None
         ),

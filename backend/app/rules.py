@@ -25,8 +25,8 @@ DEFAULT_PARAMS: dict[str, dict] = {
 #   Nilai kuis paling sulit dikendalikan langsung, sehingga diberi usaha tertinggi.
 INDICATORS: dict[str, dict] = {
     "kehadiran": {"label": "Kehadiran", "better": "up", "scale": 5.0, "step": 1, "effort": 0.20, "unit": "hari"},
-    "lms": {"label": "Aktivitas belajar daring", "better": "up", "scale": 15.0, "step": 2, "effort": 0.15, "unit": "kali"},
-    "tugas": {"label": "Tugas terlambat", "better": "down", "scale": 5.0, "step": 1, "effort": 0.20, "unit": "tugas"},
+    "lms": {"label": "Belajar online", "better": "up", "scale": 15.0, "step": 2, "effort": 0.15, "unit": "kali"},
+    "tugas": {"label": "Tugas telat", "better": "down", "scale": 5.0, "step": 1, "effort": 0.20, "unit": "tugas"},
     "kuis": {"label": "Nilai kuis", "better": "up", "scale": 100.0, "step": 5, "effort": 0.30, "unit": ""},
 }
 IND_ORDER = tuple(INDICATORS)
@@ -95,14 +95,14 @@ def worsening_streak(history: list[Week], ind: str) -> int:
 def _reason_text(ind: str, start: float, end: float, weeks: int) -> tuple[str, str]:
     a, b = _fmt(ind, start), _fmt(ind, end)
     if ind == "kehadiran":
-        text = f"Kehadiran turun dari {a} ke {b} hari per pekan selama {weeks} pekan."
+        text = f"Masuk sekolah berkurang dari {a} jadi {b} hari seminggu, selama {weeks} minggu terakhir."
     elif ind == "lms":
-        text = f"Membuka materi daring berkurang dari {a} ke {b} kali per pekan."
+        text = f"Membuka materi belajar online berkurang dari {a} jadi {b} kali seminggu."
     elif ind == "tugas":
-        text = f"Tugas yang terlambat bertambah dari {a} ke {b} per pekan."
+        text = f"Tugas yang telat dikumpulkan bertambah dari {a} jadi {b} per minggu."
     else:
-        text = f"Nilai kuis turun dari {a} ke {b}."
-    detail = f"Memburuk {weeks} pekan berturut-turut"
+        text = f"Nilai kuis turun dari {a} jadi {b}."
+    detail = f"Terjadi {weeks} minggu berturut-turut"
     return text, detail
 
 
@@ -160,15 +160,15 @@ def _k1_counterfactual(history: list[Week], triggering: list[str], params: dict)
     for t in targets:
         ind, v = t["indicator"], _fmt(t["indicator"], t["target"])
         if ind == "kehadiran":
-            parts.append(f"kehadiran kembali ke {v} hari atau lebih per pekan")
+            parts.append(f"masuk sekolah {v} hari atau lebih seminggu")
         elif ind == "lms":
-            parts.append(f"materi daring dibuka {v} kali atau lebih per pekan")
+            parts.append(f"membuka materi online {v} kali atau lebih seminggu")
         elif ind == "tugas":
-            parts.append(f"tugas terlambat turun ke {v} atau kurang per pekan")
+            parts.append(f"tugas telat paling banyak {v} per minggu")
         else:
-            parts.append(f"nilai kuis naik ke {v} atau lebih")
+            parts.append(f"nilai kuis {v} atau lebih")
     joined = " dan ".join(parts)
-    text = f"Bila {joined} selama {l_weeks} pekan berturut-turut, penandaan ini dilepas."
+    text = f"Tanda ini hilang kalau selama {l_weeks} minggu berturut-turut: {joined}."
     return {"rule": "L", "weeks": l_weeks, "targets": targets, "triggering": triggering, "text": text}
 
 
@@ -189,10 +189,10 @@ def evaluate(
     if help_pressed or safety:
         if help_pressed:
             text = "Kamu menekan tombol “Butuh bantuan sekarang”."
-            detail = "Guru BK siaga diminta menghubungimu."
+            detail = "Guru BK diminta segera menghubungimu."
         else:
             text = "Satu jawaban check-in menyangkut keselamatanmu."
-            detail = "Guru BK siaga diminta menghubungimu."
+            detail = "Guru BK diminta segera menghubungimu."
         r = ReasonOut("bantuan", "Permintaan bantuan", text, detail, [], None, 1.0)
         return Evaluation("merah", "M1", [r], None, [])
 
@@ -212,8 +212,8 @@ def evaluate(
         r = ReasonOut(
             "checkin",
             "Check-in",
-            "Beberapa jawaban check-in menunjukkan kamu mungkin sedang lelah.",
-            "Dari check-in yang kamu isi dengan sukarela",
+            "Beberapa jawaban check-in menunjukkan kamu mungkin sedang capek.",
+            "Dari check-in yang kamu isi sendiri",
             [],
             None,
             0.5,
@@ -222,7 +222,7 @@ def evaluate(
             "rule": "L",
             "weeks": p["L"]["weeks"],
             "targets": [],
-            "text": "Bila jawaban check-in dua pekan ke depan tidak lagi menunjukkan tanda lelah, penandaan ini dilepas.",
+            "text": "Tanda ini hilang kalau jawaban check-in 2 minggu ke depan tidak lagi menunjukkan rasa capek.",
         }
         return Evaluation("kuning", "K2", [r], cf, ["checkin"])
 

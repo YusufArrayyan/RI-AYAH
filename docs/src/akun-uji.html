@@ -2,15 +2,15 @@
 <html lang="id">
 <head>
 <meta charset="utf-8" />
-<title>Ri'ayah — Daftar Akun Uji</title>
+<title>Ri'ayah — Akun Uji dan Cara Masuk</title>
 <link rel="stylesheet" href="pdf.css" />
 </head>
 <body>
 
 <header class="cover">
   <div>
-    <h1>Daftar Akun Uji Ri'ayah</h1>
-    <p class="lead" style="margin-top:4pt">Akun untuk mencoba ketujuh peran di aplikasi, beserta cara mendaftar akun baru.</p>
+    <h1>Akun Uji dan Cara Masuk</h1>
+    <p class="lead" style="margin-top:4pt">Akun untuk mencoba ketujuh peran, cara siswa dan orang tua mendapat akun di sekolah sungguhan, dan cara mendaftar akun demo.</p>
     <p class="meta">Prototipe Lomba KSPI Al-Qolam 2026 · PRD Ri'ayah v2 · <span class="sim">SIMULASI</span></p>
   </div>
   <div class="ar" lang="ar">رعاية</div>
@@ -19,18 +19,17 @@
 <div class="cols">
   <div class="box info">
     <p><strong>Alamat aplikasi</strong><br><a href="https://riayah.onrender.com">https://riayah.onrender.com</a></p>
-    <p>Buka alamat ini, lalu masuk dengan email dan kata sandi di tabel. Halaman <strong>Daftar</strong> tersedia untuk membuat akun baru.</p>
+    <p>Masuk dengan <strong>email atau nomor induk</strong>, dan kata sandi. Siswa SD yang belum punya email cukup memakai nomor induknya.</p>
   </div>
   <div class="box xai">
     <p><strong>Kata sandi semua akun di tabel</strong></p>
     <p style="font-size:14pt;margin:2pt 0 4pt"><span class="mono">riayah-demo-2026</span></p>
-    <p style="font-size:8.5pt">Nilai uji untuk data SIMULASI, bukan kredensial nyata. Di sekolah, masuk memakai SSO.</p>
+    <p style="font-size:8.5pt">Nilai uji untuk data SIMULASI, bukan kredensial nyata.</p>
   </div>
 </div>
 
 <div class="box warn">
-  <p><strong>Sebelum mencoba.</strong> Server gratis tidur setelah 15 menit tanpa pengunjung; pembukaan pertama butuh sekitar 1 menit. Data tersimpan <strong>permanen</strong> di basis data PostgreSQL, termasuk akun yang Anda daftarkan dan perubahan yang dibuat pengunjung sebelumnya.</p>
-  <p>Untuk kembali ke kondisi awal, masuk sebagai admin (<span class="mono">teguh@demo.riayah.id</span>) → <strong>Impor data</strong> → <strong>Reset data demo</strong>. Reset menghapus semua akun yang didaftarkan dan mengembalikan 14 akun di bawah ke skenario awal.</p>
+  <p><strong>Sebelum mencoba.</strong> Server gratis tidur setelah 15 menit tanpa pengunjung, jadi pembukaan pertama butuh sekitar 1 menit. Data tersimpan <strong>permanen</strong>, termasuk akun yang Anda buat dan perubahan pengunjung sebelumnya. Untuk kembali ke kondisi awal: masuk sebagai admin (<span class="mono">teguh@demo.riayah.id</span>) → <strong>Impor data</strong> → <strong>Reset data demo</strong>.</p>
 </div>
 
 <h2>Akun yang sudah tersedia</h2>
@@ -40,53 +39,65 @@
   </thead>
   <tbody>
     <tr class="group"><td colspan="4">Siswa (tampilan ponsel)</td></tr>
-    <tr><td class="k">Siswa SMA</td><td>Nadia Putri · XI IPA 2</td><td class="mono">nadia@demo.riayah.id</td><td>Ditandai <span class="zone k">▲ Kuning</span>. Buka pesan Bu Sari → lihat 3 alasan, grafik tren, dan “apa yang bisa mengubah penandaan”. Pilih “Aku mau disapa”, “Aku belum mau”, atau ajukan keberatan “Ini tidak sesuai”.</td></tr>
-    <tr><td class="k">Siswa SD (mode anak)</td><td>Alya Zahra · 5A</td><td class="mono">alya@demo.riayah.id</td><td>Mode anak: wajah perasaan, sapaan satu kalimat <em>tanpa</em> zona, angka, atau grafik. Tiga pilihan setara: Boleh, Aku belum mau, Itu tidak benar.</td></tr>
-    <tr><td class="k">Siswa baru 18 tahun</td><td>Raka Mahendra · XII IPS 1</td><td class="mono">raka@demo.riayah.id</td><td>Persetujuan sebelumnya diberikan wali, jadi sistem berhenti membaca data sampai Raka memilih sendiri (konfirmasi ulang usia 18).</td></tr>
-    <tr><td class="k">Siswa tanpa penandaan</td><td>Dimas Pratama · XI IPA 2</td><td class="mono">dimas@demo.riayah.id</td><td>Zona hijau. Coba check-in mingguan, pustaka, tombol “Butuh bantuan sekarang”, dan halaman Privasi (unduh data, riwayat akses).</td></tr>
+    <tr><td class="k">Siswa SMA</td><td>Nadia Putri · XI IPA 2</td><td class="mono">nadia@demo.riayah.id</td><td>Zona <span class="zone k">▲ Kuning</span>: Bu Sari ingin ngobrol. Buka “Lihat alasannya” → tiga alasan dengan grafik dan “Kapan tanda ini hilang?”. Pilih “Boleh, aku mau ngobrol”, “Aku belum mau”, atau “Ini tidak benar”. Coba juga <strong>Cerita</strong>.</td></tr>
+    <tr><td class="k">Siswa SD (mode anak)</td><td>Alya Zahra · 5A</td><td class="mono">alya@demo.riayah.id</td><td>Mode anak: wajah perasaan, pesan satu kalimat <em>tanpa</em> zona, angka, atau grafik. Tiga pilihan: Boleh, Aku belum mau, Itu tidak benar.</td></tr>
+    <tr><td class="k">Siswa baru 18 tahun</td><td>Raka Mahendra · XII IPS 1</td><td class="mono">raka@demo.riayah.id</td><td>Izin sebelumnya diberikan orang tua, jadi data berhenti dibaca sampai Raka memilih sendiri.</td></tr>
+    <tr><td class="k">Siswa tanpa tanda</td><td>Dimas Pratama · XI IPA 2</td><td class="mono">dimas@demo.riayah.id</td><td>Zona hijau. Coba check-in, Cerita lewat tulisan, bacaan, tombol “Butuh bantuan sekarang”, dan Privasi.</td></tr>
 
-    <tr class="group"><td colspan="4">Orang tua atau wali (ponsel)</td></tr>
-    <tr><td class="k">Wali</td><td>Ibu Rina · wali Alya dan Nadia</td><td class="mono">rina@demo.riayah.id</td><td>Undangan guru BK dengan pilihan waktu (tanpa zona atau alasan), persetujuan untuk anak, hak data anak (lihat, unduh, perbaiki, hapus, tarik izin).</td></tr>
+    <tr class="group"><td colspan="4">Orang tua (ponsel)</td></tr>
+    <tr><td class="k">Orang tua</td><td>Ibu Rina · ibu Alya dan Nadia</td><td class="mono">rina@demo.riayah.id</td><td>Undangan guru BK dengan pilihan waktu (tanpa zona atau alasan), izin untuk anak, hak data anak, dan menambah anak dengan kode undangan.</td></tr>
 
     <tr class="group"><td colspan="4">Guru wali kelas atau dosen PA (desktop)</td></tr>
-    <tr><td class="k">Wali kelas SMA</td><td>Bu Sari · XI IPA 2, XII IPS 1</td><td class="mono">sari@demo.riayah.id</td><td>Daftar sapaan memakai kode siswa, tanpa nama dan skor. Buka kasus → catat “sudah menyapa” dengan kode hasil, jadwalkan ulang, teruskan ke BK, atau laporkan tanda bahaya.</td></tr>
-    <tr><td class="k">Wali kelas SD</td><td>Pak Andi · 5A</td><td class="mono">andi@demo.riayah.id</td><td>Daftar sapaan kelas SD, termasuk kasus Alya.</td></tr>
+    <tr><td class="k">Wali kelas SMA</td><td>Bu Sari · XI IPA 2, XII IPS 1</td><td class="mono">sari@demo.riayah.id</td><td>Daftar “Siswa yang perlu diajak ngobrol” memakai kode siswa, tanpa nama dan skor. Buka siswa → “Catat: sudah ngobrol”, coba lagi lain waktu, teruskan ke BK, atau laporkan tanda bahaya.</td></tr>
+    <tr><td class="k">Wali kelas SD</td><td>Pak Andi · 5A</td><td class="mono">andi@demo.riayah.id</td><td>Daftar siswa kelas SD, termasuk Alya.</td></tr>
 
     <tr class="group"><td colspan="4">Guru BK atau konselor (desktop)</td></tr>
-    <tr><td class="k">Koordinator BK</td><td>Pak Rahman</td><td class="mono">rahman@demo.riayah.id</td><td>Ada <span class="zone m">⬢ Merah</span> belum ditugaskan: klik “Ambil”, buka detail, tulis catatan terenkripsi, rujuk, undang wali, tutup kasus. Lihat Protokol krisis dan Beban layanan.</td></tr>
-    <tr><td class="k">Guru BK</td><td>Bu Maya</td><td class="mono">maya@demo.riayah.id</td><td>Hanya melihat kasus yang ditugaskan kepadanya, termasuk kasus kuning yang diteruskan guru.</td></tr>
+    <tr><td class="k">Koordinator BK</td><td>Pak Rahman</td><td class="mono">rahman@demo.riayah.id</td><td>Ada <span class="zone m">⬢ Merah</span> yang belum ditangani: klik “Ambil”, buka, tulis catatan terenkripsi, rujuk, undang orang tua, tutup. Buka juga <strong>Cerita siswa</strong>.</td></tr>
+    <tr><td class="k">Guru BK</td><td>Bu Maya</td><td class="mono">maya@demo.riayah.id</td><td>Hanya melihat kasus dan cerita yang ia tangani.</td></tr>
 
-    <tr class="group"><td colspan="4">Admin sekolah atau TI (desktop)</td></tr>
-    <tr><td class="k">Admin</td><td>Mas Teguh</td><td class="mono">teguh@demo.riayah.id</td><td>Impor CSV (kolom terlarang dibuang otomatis), templat untuk siswa baru, menyetujui akun staf baru, mengusulkan relasi, estimator beban saat mengubah ambang aturan, <strong>Reset data demo</strong>.</td></tr>
-    <tr><td class="k">Admin kedua</td><td>Bu Ratna</td><td class="mono">ratna@demo.riayah.id</td><td>Menyetujui relasi yang diusulkan Mas Teguh. Persetujuan 4 mata: pengusul tidak bisa menyetujui usulannya sendiri.</td></tr>
+    <tr class="group"><td colspan="4">Admin sekolah (desktop)</td></tr>
+    <tr><td class="k">Admin</td><td>Mas Teguh</td><td class="mono">teguh@demo.riayah.id</td><td><strong>Kode akses</strong> (kartu aktivasi siswa dan undangan orang tua, bisa dicetak), impor data, templat untuk siswa baru, menyetujui akun staf, aturan dan estimator beban, <strong>Reset data demo</strong>.</td></tr>
+    <tr><td class="k">Admin kedua</td><td>Bu Ratna</td><td class="mono">ratna@demo.riayah.id</td><td>Menyetujui relasi yang diusulkan Mas Teguh (persetujuan 4 mata: pengusul tidak bisa menyetujui usulannya sendiri).</td></tr>
 
     <tr class="group"><td colspan="4">Pimpinan dan komite (desktop)</td></tr>
-    <tr><td class="k">Pimpinan</td><td>Bu Wulan · kepala sekolah</td><td class="mono">wulan@demo.riayah.id</td><td>Dasbor agregat saja. Kelompok di bawah 10 siswa disembunyikan; tidak ada data individu atau peringkat.</td></tr>
-    <tr><td class="k">Komite etik</td><td>Dr. Hasan</td><td class="mono">hasan@demo.riayah.id</td><td>Verifikasi rantai log audit, audit keadilan, putuskan keberatan siswa, setujui usulan aturan K2 v2, jalankan 4 uji kualitas penjelasan (XAI).</td></tr>
-    <tr><td class="k">DPO</td><td>Bu Lestari</td><td class="mono">lestari@demo.riayah.id</td><td>Proses permintaan hak data (lihat, perbaiki, hapus), termasuk yang lewat batas waktu.</td></tr>
+    <tr><td class="k">Pimpinan</td><td>Bu Wulan · kepala sekolah</td><td class="mono">wulan@demo.riayah.id</td><td>Dasbor ringkasan saja. Kelompok di bawah 10 siswa disembunyikan; tidak ada data per siswa atau peringkat.</td></tr>
+    <tr><td class="k">Komite etik</td><td>Dr. Hasan</td><td class="mono">hasan@demo.riayah.id</td><td>Cek keutuhan log akses, keadilan antarkelompok, putuskan keberatan siswa, setujui usulan aturan, jalankan uji penjelasan.</td></tr>
+    <tr><td class="k">Petugas data (DPO)</td><td>Bu Lestari</td><td class="mono">lestari@demo.riayah.id</td><td>Proses permintaan lihat, perbaiki, dan hapus data, termasuk yang lewat batas waktu.</td></tr>
   </tbody>
 </table>
 
-<h2 class="page-break">Mendaftar akun baru</h2>
-<p>Buka <strong>Daftar</strong> di halaman masuk, pilih peran, lalu isi formulir. Aturan setiap peran:</p>
+<h2 class="page-break">Cara mendapat akun di sekolah sungguhan</h2>
+<p>Di sekolah, <strong>siswa dan orang tua tidak mendaftar sendiri</strong>. Sekolah yang membuatkan akun, lalu membagikan kode.</p>
 <table>
-  <thead><tr><th style="width:20%">Peran</th><th style="width:34%">Yang diisi</th><th>Setelah mendaftar</th></tr></thead>
+  <thead><tr><th style="width:18%">Siapa</th><th style="width:40%">Dari mana akunnya</th><th>Cara masuk pertama kali</th></tr></thead>
   <tbody>
-    <tr><td class="k">Siswa atau mahasiswa</td><td>Nama, email, nomor induk (NIS/NIM), jenjang, kelas atau program studi, tanggal lahir, kata sandi</td><td><strong>Langsung masuk</strong> ke halaman Persetujuan. Belum ada data mingguan sampai admin mengimpornya. Jenjang SD otomatis memakai mode anak.</td></tr>
-    <tr><td class="k">Orang tua atau wali</td><td>Nama, email, <strong>nomor induk anak</strong> (anak harus sudah terdaftar), kata sandi</td><td><strong>Langsung masuk</strong>, tetapi hubungan dengan anak <em>menunggu verifikasi sekolah</em>. Admin menyetujuinya di Pengguna dan relasi.</td></tr>
-    <tr><td class="k">Guru, guru BK, admin, pimpinan, komite</td><td>Nama, sapaan (misalnya “Bu Rina”), email, kata sandi</td><td><strong>Menunggu persetujuan admin.</strong> Belum bisa masuk sampai admin menekan “Setujui” di Pengguna dan relasi.</td></tr>
+    <tr><td class="k">Siswa</td><td>Admin memasukkan data siswa (dari Dapodik atau SIAKAD), lalu membuat <strong>kartu kode aktivasi</strong> per kelas di menu <em>Kode akses</em> dan mencetaknya. Wali kelas membagikan kartu itu.</td><td>Buka <span class="mono">/aktivasi</span> → isi nomor induk dan kode dari kartu → buat kata sandi sendiri. Email boleh dikosongkan. Kalau lupa kata sandi, minta kode baru ke wali kelas.</td></tr>
+    <tr><td class="k">Orang tua</td><td>Admin membuat <strong>kode undangan</strong> khusus untuk anak tertentu, lalu sekolah mengirimkannya lewat surat atau pesan.</td><td>Buka <span class="mono">/undangan</span> → isi kode → buat akun. Akun langsung terhubung dengan anaknya tanpa perlu disetujui lagi, karena kodenya dari sekolah. Anak kedua ditambahkan dari halaman Ringkasan.</td></tr>
+    <tr><td class="k">Guru, BK, pimpinan, komite</td><td>Dibuat admin dari data kepegawaian (menu <em>Pengguna dan relasi</em> → Tambah pengguna).</td><td>Masuk dengan email dan kata sandi sementara dari admin. Di sekolah sungguhan, masuk memakai SSO sekolah.</td></tr>
   </tbody>
 </table>
-
 <div class="box info">
-  <p><strong>Syarat isian:</strong> kata sandi minimal 8 karakter; email dan nomor induk harus unik; tanggal lahir harus masuk akal. Pesan galat menyebut isian yang perlu diperbaiki.</p>
+  <p><strong>Tentang kode.</strong> Setiap kode hanya bisa dipakai sekali dan berlaku 30 hari. Hurufnya dipilih agar tidak mudah tertukar (tanpa 0/O dan 1/I/L). Membuat kode baru otomatis membatalkan kode lama yang belum dipakai.</p>
 </div>
 
-<h3>Mengapa staf perlu disetujui</h3>
-<p>Peran guru, BK, admin, pimpinan, dan komite membuka akses ke data siswa. Kalau siapa pun bisa mendaftar lalu langsung melihat kasus, prinsip “setiap peran hanya melihat yang ia butuhkan” (PRD Bab 3) tidak berarti. Karena itu akun staf diaktifkan oleh admin, dan setiap persetujuan tercatat di log audit.</p>
+<h3>Mencoba alur kode</h3>
+<ol class="steps">
+  <li>Masuk sebagai <span class="mono">teguh@demo.riayah.id</span> → <strong>Kode akses</strong> → pilih kelas, misalnya 8B.</li>
+  <li>Tab <em>Aktivasi siswa</em> → klik <strong>Buat</strong> di salah satu siswa. Catat nomor induk dan kodenya, atau klik <strong>Cetak kartu</strong>.</li>
+  <li>Keluar → di halaman masuk klik <strong>Siswa: aktifkan akun dengan kode dari sekolah</strong> → isi nomor induk, kode, dan kata sandi baru.</li>
+  <li>Untuk orang tua: tab <em>Undangan orang tua</em> → <strong>Buat</strong> → keluar → <strong>Orang tua: pakai kode undangan dari sekolah</strong>.</li>
+</ol>
 
-<h3>Agar akun baru punya data</h3>
-<p>Siswa yang baru mendaftar belum punya data kehadiran atau tugas. Admin bisa mengisinya: masuk sebagai <span class="mono">teguh@demo.riayah.id</span> → <strong>Impor data</strong> → <strong>Templat untuk siswa baru</strong> → <em>Pola memburuk</em> → unggah berkas itu → Validasi → Impor. Langkah lengkapnya ada di dokumen <em>Alur Aplikasi Ri'ayah</em>, bagian “Uji dengan data baru”.</p>
+<h2>Daftar akun demo (tanpa kode)</h2>
+<p>Untuk mencoba cepat tanpa kode, buka <strong>daftar akun demo</strong> di bawah tombol masuk. Halaman ini hanya untuk demo.</p>
+<table>
+  <thead><tr><th style="width:22%">Peran</th><th>Setelah mendaftar</th></tr></thead>
+  <tbody>
+    <tr><td class="k">Siswa atau mahasiswa</td><td>Langsung masuk ke halaman izin data. Belum ada data mingguan sampai admin mengimpornya (Impor data → Templat untuk siswa baru). Jenjang SD otomatis memakai mode anak.</td></tr>
+    <tr><td class="k">Orang tua</td><td>Langsung masuk, tetapi hubungan dengan anak menunggu persetujuan admin (lebih cepat lewat kode undangan).</td></tr>
+    <tr><td class="k">Guru, BK, admin, pimpinan, komite</td><td>Menunggu persetujuan admin di <em>Pengguna dan relasi</em>, karena peran ini membuka akses ke data siswa.</td></tr>
+  </tbody>
+</table>
 
 <div class="foot">Ri'ayah bukan layanan darurat. Semua nama, kode siswa, nomor telepon, dan angka di aplikasi adalah data SIMULASI.</div>
 </body>

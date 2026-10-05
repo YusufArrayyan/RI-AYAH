@@ -21,7 +21,7 @@ export default function Load() {
   const { data, error, loading, reload } = useResource<LoadData>("/api/counselor/load");
   const toast = useToast();
   const [open, setOpen] = useState(false);
-  const [msg, setMsg] = useState("Beban BK di atas 85% dua pekan berturut-turut. Mohon hitung di estimator apakah ambang K2 perlu dinaikkan sementara.");
+  const [msg, setMsg] = useState("Beban BK di atas 85% dua minggu berturut-turut. Mohon hitung di estimator apakah ambang K2 perlu dinaikkan sementara.");
   const [busy, setBusy] = useState(false);
   const send = async () => {
     setBusy(true);
@@ -35,7 +35,7 @@ export default function Load() {
   };
   return (
     <>
-      <PageHead title="Beban layanan" meta={<SimTag />} sub="Penandaan tidak boleh melebihi kemampuan layanan. Bila beban terlalu tinggi, ambang aturan ikut ditinjau." />
+      <PageHead title="Beban layanan" meta={<SimTag />} sub="Jumlah siswa yang ditandai tidak boleh melebihi kemampuan layanan. Kalau beban terlalu tinggi, ambang aturan ikut ditinjau." />
       {loading && !data && <LoadingBlock />}
       {error && !data && <ErrorState error={error} onRetry={reload} />}
       {data && (
@@ -59,8 +59,8 @@ export default function Load() {
               ))}
             </section>
             <section className="card stack" aria-labelledby="tren">
-              <h2 id="tren">Kasus baru per pekan</h2>
-              <WeekBars label="Kasus baru per pekan" data={data.trend.map((t) => ({ label: t.week_offset === 0 ? "Ini" : `${t.week_offset}`, kuning: t.kuning, merah: t.merah }))} />
+              <h2 id="tren">Kasus baru per minggu</h2>
+              <WeekBars label="Kasus baru per minggu" data={data.trend.map((t) => ({ label: t.week_offset === 0 ? "Ini" : `${t.week_offset}`, kuning: t.kuning, merah: t.merah }))} />
               <div className="row small" style={{ gap: 16 }}>
                 <span className="row nowrap-row" style={{ gap: 6 }}>
                   <span aria-hidden style={{ width: 12, height: 12, borderRadius: 3, background: "var(--warn-fill)" }} /> Kuning
@@ -68,13 +68,13 @@ export default function Load() {
                 <span className="row nowrap-row" style={{ gap: 6 }}>
                   <span aria-hidden style={{ width: 12, height: 12, borderRadius: 3, background: "var(--bad)" }} /> Merah
                 </span>
-                <span className="caption">Angka di sumbu: pekan relatif terhadap pekan ini</span>
+                <span className="caption">Angka di sumbu: minggu relatif terhadap minggu ini</span>
               </div>
             </section>
           </div>
           <XaiBox title="Hubungan ambang dan beban">
             <p>
-              Ambang yang lebih rendah menandai lebih banyak siswa dan menambah beban. Bila kasus melebihi kapasitas, sapaan menjadi formalitas dan merah menumpuk. Admin dapat
+              Ambang yang lebih rendah menandai lebih banyak siswa dan menambah beban. Kalau kasus melebihi kapasitas, obrolan jadi sekadar formalitas dan kasus merah menumpuk. Admin dapat
               menghitung dampak perubahan ambang di estimator (A3); perubahan berlaku setelah disetujui komite.
             </p>
           </XaiBox>

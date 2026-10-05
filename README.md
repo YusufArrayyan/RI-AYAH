@@ -13,6 +13,12 @@ Platform pendampingan dini siswa dan mahasiswa. Ri'ayah membaca empat indikator 
 | `backend/` | FastAPI + SQLAlchemy: mesin aturan, akses per peran, audit hash berantai, enkripsi, uji |
 | `frontend/` | React + Vite + TypeScript: 26 layar dan 2 varian mode anak, responsif ponsel dan desktop |
 
+### Fitur tambahan di luar PRD
+
+- **Kode akses** (admin): kartu kode aktivasi siswa dan kode undangan orang tua per kelas, bisa dicetak. Siswa mengaktifkan akun di `/aktivasi` (juga untuk lupa kata sandi) dan masuk dengan nomor induk atau email; orang tua membuat akun di `/undangan` dan langsung terhubung dengan anaknya.
+- **Cerita lewat tulisan**: siswa yang sulit bicara langsung bisa menulis ke guru BK; yang membalas manusia, bukan AI. Isi terenkripsi dan tidak bisa dibuka wali kelas, orang tua, atau admin. Tanda “mendesak” membuka antrean merah. Chatbot AI sengaja tidak dipakai (lihat `docs/Ri-ayah-alur-aplikasi.pdf` bagian 2).
+- **Mengapa namanya Ri'ayah?** (`/tentang`): makna kata dan nilai yang dijaga.
+
 ### 28 layar menurut aktor
 
 - **Siswa (ponsel):** S1 Beranda, S2 Persetujuan, S3 Mengapa saya ditandai, S4 Check-in, S5 Pustaka, S6 Privasi, S7 Bantuan sekarang, S1-A dan S3-A mode anak
@@ -78,7 +84,7 @@ cd backend
 python -m pytest -q
 ```
 
-193 uji mencakup kriteria penerimaan PRD Bab 14.4, ditambah alur masuk dan daftar:
+201 uji mencakup kriteria penerimaan PRD Bab 14.4, ditambah alur masuk dan daftar:
 
 - **Tes peran:** setiap pasangan aktor dan objek data pada matriks Bab 3.2 (7 peran × 15 endpoint) terbukti diizinkan atau ditolak di sisi server.
 - **Tes penjelasan:** alasan yang tampil sama dengan aturan yang dijalankan, dan saran kontrafaktual benar-benar melepas tanda (termasuk 40 riwayat acak dengan indikator lain terus memburuk).

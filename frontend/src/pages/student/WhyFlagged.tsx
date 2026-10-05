@@ -68,9 +68,9 @@ export function ReasonCard({ r, startWeek }: { r: ReasonJson; startWeek?: number
 }
 
 const DECISION_TEXT: Record<string, string> = {
-  cabut: "Penandaan dicabut.",
-  pertahankan: "Penandaan dipertahankan.",
-  tinjau_aturan: "Penandaan dipertahankan untuk sementara, dan aturannya ditandai untuk ditinjau komite.",
+  cabut: "Tanda ini dicabut.",
+  pertahankan: "Tanda ini tetap.",
+  tinjau_aturan: "Tanda ini tetap untuk sementara, dan cara kerja sistemnya akan diperiksa komite.",
 };
 
 export default function WhyFlagged() {
@@ -84,9 +84,9 @@ export default function WhyFlagged() {
   if (data.zone === "hijau")
     return (
       <>
-        <h1>Mengapa saya ditandai?</h1>
+        <h1>Kenapa ada pesan ini?</h1>
         <div className="card">
-          <EmptyState title="Tidak ada penandaan saat ini" action={<Link to="/siswa" className="btn btn-ghost">Kembali ke beranda</Link>}>
+          <EmptyState title="Tidak ada yang perlu dikhawatirkan" action={<Link to="/siswa" className="btn btn-ghost">Kembali ke beranda</Link>}>
             {data.message}
           </EmptyState>
         </div>
@@ -111,7 +111,7 @@ function TeenFlag({ data, reload }: { data: FlagData; reload: () => Promise<void
     try {
       await api("/api/me/flag/respond", { method: "POST", json: { response } });
       await reload();
-      toast(response === "mau" ? `${data.teacher} akan menghubungimu.` : "Sapaan ditunda. Tidak ada akibat apa pun.");
+      toast(response === "mau" ? `${data.teacher} akan menghubungimu.` : "Ditunda dulu. Tidak ada akibat apa pun.");
     } catch (e) {
       setErr((e as Error).message);
     } finally {
@@ -126,7 +126,7 @@ function TeenFlag({ data, reload }: { data: FlagData; reload: () => Promise<void
       setConfirm(false);
       setObjecting(false);
       await reload();
-      toast("Keberatanmu terkirim ke peninjau manusia.");
+      toast("Terkirim. Guru BK atau komite akan memeriksanya.");
     } catch (e) {
       setErr((e as Error).message);
     } finally {
@@ -137,7 +137,7 @@ function TeenFlag({ data, reload }: { data: FlagData; reload: () => Promise<void
   return (
     <>
       <div className="stack" style={{ gap: 10, marginTop: 8 }}>
-        <h1>Ini yang kami lihat dan mengapa</h1>
+        <h1>Ini yang kami lihat, dan alasannya</h1>
         <div className="row">
           <ZoneChip zone={data.zone!} note="bukan diagnosis" />
         </div>
@@ -156,7 +156,7 @@ function TeenFlag({ data, reload }: { data: FlagData; reload: () => Promise<void
       </section>
 
       {data.counterfactual && (
-        <XaiBox title="Apa yang bisa mengubah penandaan ini">
+        <XaiBox title="Kapan tanda ini hilang?">
           <p>{data.counterfactual}</p>
         </XaiBox>
       )}
@@ -174,7 +174,7 @@ function TeenFlag({ data, reload }: { data: FlagData; reload: () => Promise<void
             <h2 style={{ fontSize: 17 }}>{data.objection.status === "menunggu" ? "Sedang ditinjau" : "Keberatanmu sudah diputus"}</h2>
           </div>
           {data.objection.status === "menunggu" ? (
-            <p className="small">Guru BK atau komite akan memeriksa keberatanmu dan menjelaskan hasilnya dengan bahasa sederhana. Selama ditinjau, tidak ada sapaan baru.</p>
+            <p className="small">Guru BK atau komite akan memeriksa dan menjelaskan hasilnya dengan bahasa sederhana. Selama diperiksa, guru tidak akan mengajakmu ngobrol dulu.</p>
           ) : (
             <>
               <p className="strong">{DECISION_TEXT[data.objection.decision ?? ""]}</p>
@@ -184,30 +184,30 @@ function TeenFlag({ data, reload }: { data: FlagData; reload: () => Promise<void
         </section>
       ) : data.response ? (
         <section className="card stack" style={{ gap: 8 }}>
-          <h2 style={{ fontSize: 17 }}>{data.response === "mau" ? `Kamu bersedia disapa ${data.teacher}` : "Kamu memilih belum mau disapa"}</h2>
+          <h2 style={{ fontSize: 17 }}>{data.response === "mau" ? `Kamu mau diajak ngobrol ${data.teacher}` : "Kamu memilih belum mau ngobrol"}</h2>
           <p className="small">
             {data.response === "mau"
               ? `${data.teacher} akan mencari waktu yang tenang untuk ngobrol. Kamu tetap boleh berubah pikiran.`
-              : "Sapaan ditunda. Tidak ada akibat pada nilai atau catatanmu. Kalau berubah pikiran, kamu bisa memilih lagi."}
+              : "Ditunda dulu. Tidak ada akibat pada nilai atau catatanmu. Kalau berubah pikiran, kamu bisa memilih lagi."}
           </p>
           <Button variant="ghost" onClick={() => respond(data.response === "mau" ? "belum_mau" : "mau")} loading={!!busy}>
-            {data.response === "mau" ? "Aku berubah pikiran, belum mau" : "Aku mau disapa sekarang"}
+            {data.response === "mau" ? "Aku berubah pikiran, belum mau" : "Aku mau ngobrol sekarang"}
           </Button>
         </section>
       ) : (
         <section className="stack" aria-labelledby="resp-title" style={{ gap: 10 }}>
           <h2 id="resp-title" style={{ fontSize: 17 }}>
-            Bagaimana tanggapanmu?
+            Kamu mau bagaimana?
           </h2>
           <div className="choice-row three">
             <Button variant="ghost" onClick={() => respond("mau")} loading={busy === "mau"} disabled={!!busy && busy !== "mau"}>
-              Aku mau disapa
+              Boleh, aku mau ngobrol
             </Button>
             <Button variant="ghost" onClick={() => respond("belum_mau")} loading={busy === "belum_mau"} disabled={!!busy && busy !== "belum_mau"}>
               Aku belum mau
             </Button>
             <Button variant="ghost" onClick={() => setObjecting(true)} aria-expanded={objecting} disabled={!!busy}>
-              Ini tidak sesuai
+              Ini tidak benar
             </Button>
           </div>
         </section>
@@ -218,7 +218,7 @@ function TeenFlag({ data, reload }: { data: FlagData; reload: () => Promise<void
           <div className="row nowrap-row" style={{ gap: 10 }}>
             <MessageCircleQuestion aria-hidden style={{ color: "var(--xai)" }} />
             <h2 id="obj-title" style={{ fontSize: 17 }}>
-              Apa yang tidak sesuai?
+              Apa yang tidak benar?
             </h2>
           </div>
           <p className="small">Ceritakan singkat bila mau, misalnya kamu sakit atau ikut lomba. Boleh juga dikosongkan.</p>
@@ -242,8 +242,8 @@ function TeenFlag({ data, reload }: { data: FlagData; reload: () => Promise<void
 
       <ConfirmDialog
         open={confirm}
-        title="Kirim keberatan?"
-        consequence="Penandaan ini akan ditinjau guru BK atau komite. Selama ditinjau, tidak ada sapaan baru. Hasilnya dikirim kepadamu."
+        title="Kirim keberatanmu?"
+        consequence="Guru BK atau komite akan memeriksa tanda ini. Selama diperiksa, guru tidak akan mengajakmu ngobrol dulu. Hasilnya dikirim kepadamu."
         confirmLabel="Kirim"
         loading={busy === "obj"}
         onConfirm={object}
@@ -262,7 +262,7 @@ function ChildGreeting({ data, reload }: { data: FlagData; reload: () => Promise
       <>
         <h1>Tidak ada pesan</h1>
         <div className="card">
-          <EmptyState title="Belum ada yang ingin menyapa" action={<Link to="/siswa" className="btn btn-ghost">Kembali</Link>}>
+          <EmptyState title="Belum ada pesan" action={<Link to="/siswa" className="btn btn-ghost">Kembali</Link>}>
             Kalau ingin cerita, kamu selalu boleh datang ke guru BK.
           </EmptyState>
         </div>
@@ -292,7 +292,7 @@ function ChildGreeting({ data, reload }: { data: FlagData; reload: () => Promise
         <span className="avatar" aria-hidden style={{ width: 84, height: 84, fontSize: 30, background: "#fde3c8", color: "#7a3a06" }}>
           {initials(data.teacher ?? "")}
         </span>
-        <h1>{data.teacher} ingin menyapamu</h1>
+        <h1>{data.teacher} ingin ngobrol denganmu</h1>
         <p style={{ fontSize: 19, maxWidth: "30ch" }}>{data.sentence}</p>
       </section>
 

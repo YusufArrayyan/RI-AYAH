@@ -164,7 +164,7 @@ def objection(oid: int, user: User = Depends(require_role("komite", "bk")), db: 
         "evidence": reasons_json(f, for_role="komite"),
         "rule": f"{f.rule_id} v{f.rule_version}" if f else c.rule_id,
         "counterfactual": (f.counterfactual or {}).get("text") if f else None,
-        "system_saw": ["Kehadiran", "Aktivitas belajar daring", "Tugas terlambat", "Nilai kuis"] if c.rule_id == "K1" else ["Check-in yang disetujui"],
+        "system_saw": ["Kehadiran", "Belajar online", "Tugas telat", "Nilai kuis"] if c.rule_id == "K1" else ["Check-in yang disetujui"],
         "system_not_saw": ["Isi pesan", "Media sosial", "Lokasi", "Keimanan"],
     }
 
@@ -193,7 +193,7 @@ def decide(oid: int, body: DecideIn, user: User = Depends(require_role("komite",
     if body.decision == "cabut":
         c.status = "ditutup"
         c.closed_at = now
-        c.closed_reason = "Penandaan dicabut setelah keberatan"
+        c.closed_reason = "Tanda dicabut setelah keberatan"
         if c.flag_id:
             f = db.get(Flag, c.flag_id)
             f.active, f.released_at = False, now
@@ -204,7 +204,7 @@ def decide(oid: int, body: DecideIn, user: User = Depends(require_role("komite",
         rv = db.scalars(select(RuleVersion).where(RuleVersion.rule_id == f.rule_id, RuleVersion.status == "aktif")).first()
         if rv:
             rv.reason = (rv.reason or "") + f"\n[Perlu ditinjau] Keberatan #{o.id}: {body.reason.strip()[:200]}"
-    db.add(FollowUp(case_id=c.id, actor_id=user.id, action="putusan_keberatan", outcome={"cabut": "Penandaan dicabut", "pertahankan": "Penandaan dipertahankan dengan alasan", "tinjau_aturan": "Aturan ditandai untuk ditinjau"}[body.decision]))
+    db.add(FollowUp(case_id=c.id, actor_id=user.id, action="putusan_keberatan", outcome={"cabut": "Tanda dicabut", "pertahankan": "Tanda tetap, dengan alasan tertulis", "tinjau_aturan": "Aturan ditandai untuk ditinjau"}[body.decision]))
     audit.write(db, user, "putus_keberatan", "kasus", c.id, body.decision, commit=False)
     db.commit()
     return {"ok": True}

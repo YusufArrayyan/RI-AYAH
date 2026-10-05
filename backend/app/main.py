@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .config import settings
-from .routers import admin, auth, common, counselor, ethics, guardian, leader, student, teacher
+from .routers import admin, auth, common, counselor, ethics, guardian, leader, stories, student, teacher
 from .seed import ensure_seeded
 
 FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
@@ -46,7 +46,7 @@ async def security_headers(request: Request, call_next):
     return response
 
 
-for r in (auth, common, student, guardian, teacher, counselor, admin, leader, ethics):
+for r in (auth, common, student, stories, guardian, teacher, counselor, admin, leader, ethics):
     app.include_router(r.router)
 
 

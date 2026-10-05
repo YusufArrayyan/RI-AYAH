@@ -76,7 +76,7 @@ def dashboard(weeks: int = 8, user: User = Depends(leader_only), db: Session = D
         "levels": levels,
         "min_group": AGGREGATE_MIN,
         "actions": [
-            "Jadwalkan pelatihan menyapa untuk wali kelas yang baru bergabung.",
+            "Jadwalkan pelatihan memulai obrolan untuk wali kelas yang baru bergabung.",
             "Tinjau kapasitas BK bersama koordinator bila respons merah mendekati 24 jam.",
             "Bahas hasil audit keadilan semester ini dengan komite etik.",
         ],

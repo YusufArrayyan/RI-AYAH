@@ -27,7 +27,7 @@ interface ObjDetail {
   system_not_saw: string[];
 }
 const DECISIONS = [
-  { id: "cabut", label: "Cabut penandaan" },
+  { id: "cabut", label: "Cabut tanda" },
   { id: "pertahankan", label: "Pertahankan dengan alasan" },
   { id: "tinjau_aturan", label: "Tandai aturan untuk ditinjau" },
 ];
@@ -169,7 +169,7 @@ export default function Objections() {
                         <blockquote style={{ margin: 0, padding: "10px 12px", background: "var(--panel)", borderRadius: 10, border: "1px solid var(--hairline)" }}>{d.statement}</blockquote>
                       </div>
                       <div>
-                        <h3 style={{ fontSize: 14.5, marginBottom: 4 }}>Bukti penandaan</h3>
+                        <h3 style={{ fontSize: 14.5, marginBottom: 4 }}>Alasan tanda</h3>
                         <ul style={{ margin: 0, paddingLeft: "1.1em" }} className="small">
                           {d.evidence.map((e) => (
                             <li key={e.rank}>{e.text}</li>

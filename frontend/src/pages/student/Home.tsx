@@ -55,7 +55,7 @@ export default function StudentHome() {
       <div className="m-greeting">
         <h1>Halo, {data.nickname}</h1>
         <p className="muted">
-          {data.week ? `Data terakhir dari sekolah: pekan ke-${data.week} semester ini.` : "Belum ada data mingguan dari sekolah. Kamu tetap bisa mengatur izin dan membaca pustaka."}
+          {data.week ? `Data terakhir dari sekolah: minggu ke-${data.week} semester ini.` : "Belum ada data mingguan dari sekolah. Kamu tetap bisa mengatur izin dan melihat bacaan."}
         </p>
       </div>
 
@@ -97,10 +97,10 @@ export default function StudentHome() {
           </div>
           <div className="stack" style={{ marginTop: 14, gap: 8 }}>
             <Link to="/siswa/alasan" className="btn btn-primary btn-block">
-              Lihat apa yang kami lihat
+              Lihat alasannya
             </Link>
             <p className="caption" style={{ textAlign: "center" }}>
-              Kamu bisa menolak sapaan. Tidak ada akibat apa pun pada nilaimu.
+              Kamu boleh menolak. Tidak ada akibat apa pun pada nilaimu.
             </p>
           </div>
         </section>
@@ -119,14 +119,14 @@ export default function StudentHome() {
           </span>
           <div className="stack grow" style={{ gap: 4 }}>
             <h2 id="ci-title" style={{ fontSize: 17 }}>
-              Check-in pekan ini
+              Check-in minggu ini
             </h2>
             {!data.checkin.consented ? (
               <p className="small">Check-in belum aktif. Kamu bisa mengaktifkannya kapan saja, atau membiarkannya mati.</p>
             ) : data.checkin.done ? (
               <p className="small">Sudah terisi. Terima kasih sudah meluangkan waktu.</p>
             ) : (
-              <p className="small">Empat pertanyaan singkat, sekitar satu menit. Setiap pertanyaan boleh dilewati.</p>
+              <p className="small">Empat pertanyaan singkat tentang perasaanmu, sekitar satu menit. Semua boleh dilewati.</p>
             )}
           </div>
         </div>
@@ -141,6 +141,16 @@ export default function StudentHome() {
           </Link>
         )}
       </section>
+
+      <Link to="/siswa/cerita" className="card" style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <span className="grow">
+          <span className="strong" style={{ display: "block" }}>
+            Sulit cerita langsung?
+          </span>
+          <span className="small">Tulis saja ke guru BK. Hanya guru BK yang membaca, dan ia akan membalas.</span>
+        </span>
+        <ChevronRight aria-hidden style={{ width: 20, height: 20, color: "var(--mute)", flex: "none" }} />
+      </Link>
 
       {data.library.length > 0 && (
         <section className="section" aria-labelledby="lib-title">
@@ -160,7 +170,7 @@ export default function StudentHome() {
 
       <p className="row nowrap-row caption" style={{ gap: 8, alignItems: "flex-start" }}>
         <ShieldCheck aria-hidden style={{ width: 16, height: 16, color: "var(--xai)", flex: "none", marginTop: 1 }} />
-        Beranda tidak menampilkan skor atau zona. Kami tidak membaca pesan, media sosial, lokasi, atau keimananmu.
+        Beranda tidak menampilkan nilai atau skor. Kami tidak membaca pesan, media sosial, lokasi, atau ibadahmu.
       </p>
     </>
   );

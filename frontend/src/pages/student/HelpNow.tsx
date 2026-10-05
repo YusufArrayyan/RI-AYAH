@@ -1,6 +1,6 @@
-import { CircleCheck, Clock, MessageSquareHeart, Phone, PhoneCall } from "lucide-react";
+import { CircleCheck, Clock, MessageSquareHeart, PenLine, Phone, PhoneCall } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Banner, Button } from "../../components/ui";
 import { api } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
@@ -115,6 +115,9 @@ export default function HelpNow() {
         </section>
       )}
 
+      <Link to="/siswa/cerita" className="btn btn-ghost btn-block" style={{ minHeight: 52 }}>
+        <PenLine aria-hidden /> Tulis pesan ke guru BK
+      </Link>
       <a href={`sms:?&body=${smsText}`} className="btn btn-ghost btn-block" style={{ minHeight: 52 }}>
         <MessageSquareHeart aria-hidden /> Kirim pesan ke orang yang kamu percaya
       </a>

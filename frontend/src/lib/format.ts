@@ -63,7 +63,7 @@ export function initials(name: string): string {
 
 export const STATUS_LABEL: Record<string, string> = {
   baru: "Baru",
-  disapa: "Disapa",
+  disapa: "Sudah diajak ngobrol",
   ditindaklanjuti: "Ditindaklanjuti",
   ditutup: "Ditutup",
   terlambat: "Terlambat",
@@ -72,8 +72,8 @@ export const STATUS_LABEL: Record<string, string> = {
 
 export const INDICATOR_LABEL: Record<string, string> = {
   kehadiran: "Kehadiran",
-  lms: "Aktivitas belajar daring",
-  tugas: "Tugas terlambat",
+  lms: "Belajar online",
+  tugas: "Tugas telat",
   kuis: "Nilai kuis",
   checkin: "Check-in",
 };

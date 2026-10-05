@@ -23,7 +23,7 @@ export default function LibraryItem() {
   if (!data) return null;
   return (
     <article className="stack" style={{ gap: 14 }}>
-      <PageHead title={data.title} back={{ to: "/siswa/pustaka", label: "Pustaka" }} sub={data.summary} />
+      <PageHead title={data.title} back={{ to: "/siswa/pustaka", label: "Bacaan" }} sub={data.summary} />
       <div className="row">
         <span className="chip chip-info">{data.label}</span>
         <span className="chip chip-neutral">{data.category}</span>

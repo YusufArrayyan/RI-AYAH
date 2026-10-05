@@ -13,7 +13,7 @@ export interface Child {
 
 export const CONSENT_STATUS: Record<string, { label: string; cls: string }> = {
   belum: { label: "Belum ada persetujuan", cls: "chip-neutral" },
-  menunggu_asen: { label: "Menunggu asen anak", cls: "chip-warn" },
+  menunggu_asen: { label: "Menunggu persetujuan anak", cls: "chip-warn" },
   aktif: { label: "Persetujuan aktif", cls: "chip-ok" },
 };
 

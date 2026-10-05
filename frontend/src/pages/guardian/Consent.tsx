@@ -84,7 +84,7 @@ export default function GuardianConsent() {
                 desc={i.description}
                 status={
                   i.granted
-                    ? `Anda setuju sejak ${fmtDate(i.since)} · ${i.child_assent ? "anak sudah asen" : "menunggu asen anak"}`
+                    ? `Anda setuju sejak ${fmtDate(i.since)} · ${i.child_assent ? "anak juga sudah setuju" : "menunggu persetujuan anak"}`
                     : "Tidak aktif"
                 }
                 statusOn={i.granted && !!i.child_assent}
@@ -94,7 +94,7 @@ export default function GuardianConsent() {
             ))}
           </section>
 
-          <XaiBox title="Asen anak" tag="Jaminan">
+          <XaiBox title="Anak juga ditanya" tag="Jaminan">
             <p>
               Setelah Anda setuju, {d.child.name.split(" ")[0]} juga ditanya dengan bahasa yang sesuai usianya. Data baru dibaca bila Anda dan anak sama-sama setuju. Anak boleh
               menolak tanpa akibat.

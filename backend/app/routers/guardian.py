@@ -68,6 +68,22 @@ def children(user: User = Depends(guardian_only), db: Session = Depends(get_db))
     return out
 
 
+class LinkIn(BaseModel):
+    code: str
+
+
+@router.post("/link")
+def link_child(body: LinkIn, user: User = Depends(guardian_only), db: Session = Depends(get_db)):
+    """Wali yang sudah punya akun menambahkan anak lain dengan kode undangan sekolah."""
+    from .. import codes
+    from .auth import link_guardian
+
+    ac = codes.redeem(db, body.code, "undangan_wali")
+    child = link_guardian(db, user, ac)
+    db.commit()
+    return {"ok": True, "child": {"id": child.id, "nickname": child.nickname, "class_name": child.class_name}}
+
+
 @router.get("/pending")
 def pending(user: User = Depends(guardian_only), db: Session = Depends(get_db)):
     """Anak yang hubungannya belum diverifikasi sekolah. Hanya nama dan kelas."""
@@ -87,7 +103,7 @@ def get_consent(sid: int, user: User = Depends(guardian_only), db: Session = Dep
     return {
         "child": {"id": student.id, "name": student.name, "class_name": student.class_name, "mode": student.ui_mode},
         **cs,
-        "purpose": "Satu tujuan saja: agar wali kelas dan guru BK bisa menyapa anak lebih awal bila beberapa hal berubah.",
+        "purpose": "Hanya satu tujuan: supaya wali kelas dan guru BK bisa mengajak anak ngobrol lebih awal kalau ada yang berubah.",
         "not_read": NOT_READ,
         "rights": [
             "Melihat dan mengunduh data anak yang tersimpan",
@@ -191,7 +207,7 @@ def rights(sid: int, user: User = Depends(guardian_only), db: Session = Depends(
         "child": {"id": student.id, "name": student.name, "class_name": student.class_name},
         "consent": _consent_summary(db, student),
         "stored": [
-            f"Catatan kehadiran, aktivitas belajar daring, tugas terlambat, dan nilai kuis untuk {weeks} pekan",
+            f"Catatan kehadiran, belajar online, tugas telat, dan nilai kuis untuk {weeks} minggu",
             f"{checkins} check-in mingguan (isinya hanya terbaca guru BK)",
             "Riwayat persetujuan Anda dan asen anak",
             "Catatan siapa yang membuka data anak dan kapan",

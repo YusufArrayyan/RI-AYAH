@@ -7,7 +7,7 @@ import { ROLE_HOME, useAuth, type Role, type User } from "../lib/auth";
 import { AuthIntro, PasswordField } from "./Login";
 
 const ROLES: { id: Role; label: string; desc: string; icon: ReactNode; note: string }[] = [
-  { id: "siswa", label: "Siswa atau mahasiswa", desc: "Mengatur izin data, check-in, dan membaca alasan bila disapa.", icon: <GraduationCap aria-hidden />, note: "Langsung bisa masuk." },
+  { id: "siswa", label: "Siswa atau mahasiswa", desc: "Mengatur izin data, check-in, dan membaca alasan bila diajak ngobrol.", icon: <GraduationCap aria-hidden />, note: "Langsung bisa masuk." },
   { id: "wali", label: "Orang tua atau wali", desc: "Memberi persetujuan untuk anak dan menerima undangan guru BK.", icon: <Users aria-hidden />, note: "Hubungan dengan anak diverifikasi sekolah." },
   { id: "guru", label: "Guru wali kelas atau dosen PA", desc: "Menyapa siswa kelas binaan yang berada di zona kuning.", icon: <HeartHandshake aria-hidden />, note: "Menunggu persetujuan admin." },
   { id: "bk", label: "Guru BK atau konselor", desc: "Menangani kasus merah, catatan sesi, dan rujukan.", icon: <Inbox aria-hidden />, note: "Menunggu persetujuan admin." },
@@ -81,8 +81,8 @@ export default function Register() {
         ) : !role ? (
           <div className="stack" style={{ gap: 18 }}>
             <div className="stack" style={{ gap: 6 }}>
-              <h2 style={{ fontSize: 24 }}>Daftar akun baru</h2>
-              <p>Pilih peran Anda. Formulir menyesuaikan peran yang dipilih.</p>
+              <h2 style={{ fontSize: 24 }}>Daftar akun demo</h2>
+              <p>Halaman ini untuk mencoba aplikasi. Di sekolah sungguhan, siswa dan orang tua memakai kode dari sekolah, dan akun staf dibuat admin.</p>
             </div>
             <div className="role-grid">
               {ROLES.map((r) => (
@@ -127,10 +127,10 @@ export default function Register() {
               {staff && (
                 <div className="field">
                   <label className="label" htmlFor="title">
-                    Sapaan <span className="muted">(opsional)</span>
+                    Nama panggilan di sekolah <span className="muted">(opsional)</span>
                   </label>
                   <input id="title" name="title" className="input" autoComplete="off" placeholder="Misalnya: Bu Rina…" value={f.title} onChange={(e) => set("title")(e.target.value)} />
-                  <span className="hint">Ditampilkan ke siswa, misalnya “Bu Rina ingin menyapa”.</span>
+                  <span className="hint">Ditampilkan ke siswa, misalnya “Bu Rina ingin ngobrol sebentar denganmu”.</span>
                 </div>
               )}
               <div className="field">

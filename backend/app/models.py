@@ -360,3 +360,47 @@ class Setting(Base):
     __tablename__ = "setting"
     key: Mapped[str] = mapped_column(String(60), primary_key=True)
     value: Mapped[dict] = mapped_column(JSON)
+
+
+class AccessCode(Base):
+    """Kode sekali pakai dari sekolah: aktivasi akun siswa atau undangan orang tua.
+
+    Kode dibagikan langsung oleh wali kelas (kartu cetak) atau lewat surat ke orang tua,
+    sehingga hubungan wali–anak sudah terverifikasi sekolah saat kode dipakai.
+    """
+
+    __tablename__ = "access_code"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    code: Mapped[str] = mapped_column(String(12), unique=True, index=True)
+    kind: Mapped[str] = mapped_column(String(20))  # aktivasi | undangan_wali
+    student_id: Mapped[int] = mapped_column(ForeignKey("user.id"), index=True)
+    created_by: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime)
+    used_by: Mapped[int | None] = mapped_column(ForeignKey("user.id"))
+    revoked: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class StoryThread(Base):
+    """“Cerita lewat tulisan”: percakapan tertulis siswa dengan guru BK (manusia, bukan AI)."""
+
+    __tablename__ = "story_thread"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey("user.id"), index=True)
+    counselor_id: Mapped[int | None] = mapped_column(ForeignKey("user.id"))
+    status: Mapped[str] = mapped_column(String(20), default="terbuka")  # terbuka | selesai
+    urgent: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    last_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class StoryMessage(Base):
+    __tablename__ = "story_message"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    thread_id: Mapped[int] = mapped_column(ForeignKey("story_thread.id"), index=True)
+    author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    from_role: Mapped[str] = mapped_column(String(10))  # siswa | bk
+    body_enc: Mapped[str] = mapped_column(Text)
+    read: Mapped[bool] = mapped_column(Boolean, default=False)
+    at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)

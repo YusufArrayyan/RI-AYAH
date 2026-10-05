@@ -82,7 +82,7 @@ export default function TeacherCase() {
   return (
     <>
       <PageHead
-        back={{ to: "/guru", label: "Daftar sapaan" }}
+        back={{ to: "/guru", label: "Daftar siswa" }}
         title={data.student_name ?? data.code}
         meta={<SimTag />}
         actions={
@@ -111,7 +111,7 @@ export default function TeacherCase() {
                 ))}
               </section>
               {data.counterfactual && (
-                <XaiBox title="Apa yang bisa mengubah penandaan ini">
+                <XaiBox title="Kapan tanda ini hilang?">
                   <p>{data.counterfactual}</p>
                 </XaiBox>
               )}
@@ -139,18 +139,18 @@ export default function TeacherCase() {
               )}
             </div>
             {data.student_response && (
-              <Banner kind="info">{data.student_response === "mau" ? "Siswa memilih: mau disapa." : "Siswa memilih: belum mau. Jadwalkan ulang dengan jarak yang cukup."}</Banner>
+              <Banner kind="info">{data.student_response === "mau" ? "Siswa memilih: mau diajak ngobrol." : "Siswa memilih: belum mau. Coba lagi lain waktu, paling cepat seminggu lagi."}</Banner>
             )}
             {open ? (
               <>
                 <Button icon={<CheckCheck aria-hidden />} onClick={() => setMode(mode === "disapa" ? null : "disapa")} aria-expanded={mode === "disapa"} block>
-                  Catat sudah menyapa
+                  Catat: sudah ngobrol
                 </Button>
                 {mode === "disapa" && (
                   <div className="stack" style={{ gap: 8 }}>
                     <fieldset className="option-list">
                       <legend className="label" style={{ marginBottom: 6 }}>
-                        Kode hasil (tanpa isi cerita)
+                        Hasilnya (jangan tulis isi cerita siswa)
                       </legend>
                       {data.outcomes.map((o) => (
                         <label key={o} className="option" style={{ minHeight: 44, fontSize: 14.5 }}>
@@ -159,13 +159,13 @@ export default function TeacherCase() {
                         </label>
                       ))}
                     </fieldset>
-                    <Button onClick={() => act("disapa", { outcome }, "Sapaan tercatat.")} disabled={!outcome} loading={busy === "disapa"}>
+                    <Button onClick={() => act("disapa", { outcome }, "Tercatat.")} disabled={!outcome} loading={busy === "disapa"}>
                       Simpan
                     </Button>
                   </div>
                 )}
                 <Button variant="ghost" icon={<CalendarClock aria-hidden />} onClick={() => setMode(mode === "jadwal" ? null : "jadwal")} aria-expanded={mode === "jadwal"} block>
-                  Jadwalkan ulang
+                  Coba lagi lain waktu
                 </Button>
                 {mode === "jadwal" && (
                   <div className="row nowrap-row">
@@ -195,16 +195,16 @@ export default function TeacherCase() {
             {err && <Banner kind="bad">{err}</Banner>}
           </section>
           <Link to="/guru/panduan" className="card tight small strong" style={{ color: "var(--primary-dark)" }}>
-            Bingung mau mulai dari mana? Buka panduan menyapa →
+            Bingung mau mulai dari mana? Buka panduan memulai obrolan →
           </Link>
-          <HumanNote>Penandaan bukan diagnosis. Anda menyapa sebagai guru yang peduli, bukan sebagai penilai.</HumanNote>
+          <HumanNote>Ini bukan diagnosis. Anda mengajak ngobrol sebagai guru yang peduli, bukan sebagai penilai.</HumanNote>
         </aside>
       </div>
 
       <ConfirmDialog
         open={danger}
         title="Laporkan tanda bahaya?"
-        consequence="Antrean merah guru BK dibuka sekarang, dengan target kontak dalam 24 jam. Gunakan bila siswa menyebut ingin menyakiti diri atau tidak merasa aman."
+        consequence="Guru BK akan diminta menghubungi siswa ini dalam 24 jam. Gunakan bila siswa menyebut ingin menyakiti diri atau tidak merasa aman."
         confirmLabel="Buka antrean merah"
         danger
         loading={busy === "tanda_bahaya"}

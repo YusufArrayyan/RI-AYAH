@@ -39,7 +39,7 @@ interface Detail {
 
 const CONSENT_LABEL: Record<string, string> = {
   kehadiran: "Kehadiran",
-  lms: "Belajar daring",
+  lms: "Belajar online",
   tugas: "Tugas",
   kuis: "Kuis",
   checkin: "Check-in",
@@ -145,7 +145,7 @@ export default function CounselorCase() {
               <dt>Penanggung jawab</dt>
               <dd>{data.owner}</dd>
               <dt>Tanggapan siswa</dt>
-              <dd>{data.student_response === "mau" ? "Mau disapa" : data.student_response === "belum_mau" ? "Belum mau" : "Belum ada"}</dd>
+              <dd>{data.student_response === "mau" ? "Mau diajak ngobrol" : data.student_response === "belum_mau" ? "Belum mau" : "Belum memilih"}</dd>
               <dt>Wali</dt>
               <dd>{data.guardian?.name ?? "Tidak ada (mahasiswa atau belum terdaftar)"}</dd>
             </dl>
@@ -172,16 +172,16 @@ export default function CounselorCase() {
             </Banner>
           )}
 
-          <XaiBox title="Jejak aturan dan angka per pekan">
+          <XaiBox title="Jejak aturan dan angka per minggu">
             <p className="small" style={{ marginBottom: 8 }}>
-              K1 aktif: {k1.min_indicators} indikator atau lebih memburuk {k1.weeks} pekan berturut-turut. K2: skor check-in ≥ {data.params.K2.threshold}.
+              K1 aktif: {k1.min_indicators} indikator atau lebih memburuk {k1.weeks} minggu berturut-turut. K2: skor check-in ≥ {data.params.K2.threshold}.
             </p>
             <div className="table-wrap" style={{ background: "#fff", borderRadius: 10, border: "1px solid var(--hairline)" }}>
               <table className="table">
                 <caption className="sr-only">Indikator mingguan</caption>
                 <thead>
                   <tr>
-                    <th scope="col">Pekan</th>
+                    <th scope="col">Minggu</th>
                     {(["kehadiran", "lms", "tugas", "kuis"] as const).map((k) => (
                       <th key={k} scope="col">
                         {INDICATOR_LABEL[k]}
@@ -355,7 +355,7 @@ export default function CounselorCase() {
       <ConfirmDialog
         open={confirmClose}
         title="Tutup kasus ini?"
-        consequence={`Penandaan dilepas dan kasus keluar dari antrean. Tinjauan dijadwalkan ${review || "-"}.`}
+        consequence={`Tanda dilepas dan kasus keluar dari antrean. Tinjauan dijadwalkan ${review || "-"}.`}
         confirmLabel="Tutup kasus"
         loading={busy === "tutup"}
         onConfirm={() => act("tutup", { reason, review_at: review }, "Kasus ditutup.")}

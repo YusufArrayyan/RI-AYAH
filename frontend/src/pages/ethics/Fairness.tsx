@@ -52,14 +52,14 @@ export default function Fairness() {
         <div className="stack" style={{ gap: 20 }}>
           <Banner kind="warn">Angka di halaman ini berasal dari data SIMULASI untuk menunjukkan tata letak. Ambang “Tinjau” (rasio di luar 0,8–1,25) adalah usulan.</Banner>
           <div className="stat-strip">
-            <Stat value={pct(data.reference_rate, 1)} label="Tingkat penandaan keseluruhan" note="Referensi rasio" />
-            <Stat value={pct(data.timeliness.rate)} label="Kuning disapa dalam 7 hari" note={`${data.timeliness.timely} dari ${data.timeliness.yellow_total}`} />
+            <Stat value={pct(data.reference_rate, 1)} label="Persentase ditandai (keseluruhan)" note="Referensi rasio" />
+            <Stat value={pct(data.timeliness.rate)} label="Kuning diajak ngobrol dalam 7 hari" note={`${data.timeliness.timely} dari ${data.timeliness.yellow_total}`} />
             <Stat value={data.rows.filter((r) => r.status === "Tinjau").length} label="Kelompok perlu ditinjau" tone={data.rows.some((r) => r.status === "Tinjau") ? "warn" : undefined} />
           </div>
           <div className="layout-2col">
             <section className="card flush" aria-labelledby="grp">
               <h2 id="grp" style={{ padding: "16px 16px 4px" }}>
-                Tingkat penandaan per kelompok
+                Persentase ditandai per kelompok
               </h2>
               <div className="table-wrap">
                 <table className="table stack-mobile">
@@ -68,10 +68,10 @@ export default function Fairness() {
                     <tr>
                       <th scope="col">Kelompok</th>
                       <th scope="col" style={{ minWidth: 220 }}>
-                        Tingkat penandaan
+                        Persentase ditandai
                       </th>
                       <th scope="col">Rasio</th>
-                      <th scope="col">Sapaan tepat</th>
+                      <th scope="col">Tepat waktu</th>
                       <th scope="col">Status</th>
                       <th scope="col">
                         <span className="sr-only">Aksi</span>
@@ -99,13 +99,13 @@ export default function Fairness() {
                               n = {r.n}
                             </span>
                           </td>
-                          <td data-label="Tingkat penandaan">
+                          <td data-label="Persentase ditandai">
                             <HBar label="" value={r.flag_rate ?? 0} max={maxRate} mark={data.reference_rate} display={pct(r.flag_rate, 1)} tone={r.status === "Tinjau" ? "warn" : undefined} />
                           </td>
                           <td data-label="Rasio" className="tnum strong">
                             {fmtNum(r.ratio, 2)}
                           </td>
-                          <td data-label="Sapaan tepat" className="tnum">
+                          <td data-label="Tepat waktu" className="tnum">
                             {r.timely_rate === null || r.timely_rate === undefined ? "-" : pct(r.timely_rate)}
                           </td>
                           <td data-label="Status">

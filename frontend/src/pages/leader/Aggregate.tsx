@@ -27,12 +27,12 @@ export default function Aggregate() {
   const exportCsv = () => {
     if (!data) return;
     const rows = [
-      ["Ringkasan Ri'ayah (SIMULASI)", `${data.weeks} pekan`],
+      ["Ringkasan Ri'ayah (SIMULASI)", `${data.weeks} minggu`],
       ["Partisipasi", pct(data.participation)],
-      ["Sapaan tepat waktu", pct(data.timely_rate)],
+      ["Diajak ngobrol tepat waktu", pct(data.timely_rate)],
       ["Median respons merah (jam)", String(data.red_median_hours ?? "-")],
       [],
-      ["Jenjang", "Partisipasi", "Sapaan tepat waktu"],
+      ["Jenjang", "Partisipasi", "Diajak ngobrol tepat waktu"],
       ...data.levels.map((l) => [l.level, l.hidden ? `disembunyikan (<${data.min_group})` : pct(l.participation), l.hidden ? "" : pct(l.timely)]),
     ];
     const blob = new Blob([rows.map((r) => r.join(",")).join("\n")], { type: "text/csv" });
@@ -58,7 +58,7 @@ export default function Aggregate() {
       <div className="filter-chips" role="group" aria-label="Periode" style={{ marginBottom: 16 }}>
         {[4, 8, 12].map((w) => (
           <button key={w} type="button" className="filter-chip" aria-pressed={weeks === w} onClick={() => setWeeks(w)}>
-            {w} pekan
+            {w} minggu
           </button>
         ))}
       </div>
@@ -66,14 +66,14 @@ export default function Aggregate() {
       {error && !data && <ErrorState error={error} onRetry={reload} />}
       {data && !data.enough_data && (
         <div className="card">
-          <EmptyState title="Belum cukup data">Dasbor terisi setelah beberapa pekan pemakaian.</EmptyState>
+          <EmptyState title="Belum cukup data">Dasbor terisi setelah beberapa minggu pemakaian.</EmptyState>
         </div>
       )}
       {data && data.enough_data && (
         <div className="stack" style={{ gap: 20 }} aria-busy={loading}>
           <div className="stat-strip">
             <Stat value={pct(data.participation)} label="Siswa yang ikut" note="Dari yang ditawari persetujuan" />
-            <Stat value={pct(data.timely_rate)} label="Kuning disapa dalam 7 hari" note="Target awal 80%" tone={data.timely_rate !== null && data.timely_rate < 0.8 ? "warn" : undefined} />
+            <Stat value={pct(data.timely_rate)} label="Kuning diajak ngobrol dalam 7 hari" note="Target awal 80%" tone={data.timely_rate !== null && data.timely_rate < 0.8 ? "warn" : undefined} />
             <Stat value={data.red_median_hours !== null ? `${fmtNum(data.red_median_hours)} jam` : "-"} label="Median respons merah" note="Target kurang dari 24 jam" />
           </div>
           <XaiBox title="Mengapa data individu tidak tampil">
@@ -81,8 +81,8 @@ export default function Aggregate() {
           </XaiBox>
           <div className="layout-2col even">
             <section className="card stack" aria-labelledby="tren">
-              <h2 id="tren">Kasus baru per pekan</h2>
-              <LineChart points={data.trend} label="Kasus baru per pekan" />
+              <h2 id="tren">Kasus baru per minggu</h2>
+              <LineChart points={data.trend} label="Kasus baru per minggu" />
             </section>
             <section className="card stack" aria-labelledby="jenjang">
               <h2 id="jenjang">Per jenjang</h2>

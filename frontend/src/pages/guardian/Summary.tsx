@@ -1,5 +1,5 @@
 import { CalendarCheck, CalendarClock, MessageCircle, Phone } from "lucide-react";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { Banner, Button, EmptyState, ErrorState, LoadingBlock, XaiBox } from "../../components/ui";
 import { api, useResource } from "../../lib/api";
@@ -25,6 +25,42 @@ interface SummaryData {
   bk_contact: { name: string; hours: string };
 }
 
+function AddChild({ onAdded }: { onAdded: () => void }) {
+  const [code, setCode] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const toast = useToast();
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setErr(null);
+    try {
+      const r = await api<{ child: { nickname: string } }>("/api/guardian/link", { method: "POST", json: { code } });
+      toast(`${r.child.nickname} sekarang terhubung dengan akun Anda.`);
+      setCode("");
+      onAdded();
+    } catch (e2) {
+      setErr((e2 as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <form onSubmit={submit} className="card stack" style={{ gap: 8 }}>
+      <label className="label" htmlFor="add-code">
+        Tambah anak dengan kode undangan dari sekolah
+      </label>
+      <div className="row nowrap-row">
+        <input id="add-code" className="input mono" autoComplete="one-time-code" spellCheck={false} placeholder="Contoh: H4TN-8WEB…" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} style={{ letterSpacing: "0.08em" }} />
+        <Button type="submit" loading={busy} disabled={code.replace(/[^A-Z0-9]/g, "").length !== 8}>
+          Tambah
+        </Button>
+      </div>
+      {err && <span className="field-error">{err}</span>}
+    </form>
+  );
+}
+
 /** W2 Ringkasan dan kontak BK. */
 export default function GuardianSummary() {
   const kids = useChildren();
@@ -35,13 +71,16 @@ export default function GuardianSummary() {
   if (kids.error && !kids.data) return <ErrorState error={kids.error} onRetry={kids.reload} />;
   if (!kids.data?.length)
     return (
+      <>
+      <AddChild onAdded={kids.reload} />
       <div className="card">
         <EmptyState title={pending.data?.length ? "Menunggu verifikasi sekolah" : "Belum ada anak yang terhubung"}>
           {pending.data?.length
             ? `Hubungan Anda dengan ${pending.data.map((p) => `${p.name} (${p.class_name})`).join(", ")} sedang diverifikasi admin sekolah. Setelah disetujui, persetujuan dan undangan BK muncul di sini.`
-            : "Hubungi sekolah untuk memverifikasi hubungan Anda sebagai wali."}
+            : "Masukkan kode undangan dari sekolah di atas, atau hubungi sekolah."}
         </EmptyState>
       </div>
+      </>
     );
   const st = CONSENT_STATUS[kids.selected!.consent_status];
   return (
@@ -78,6 +117,7 @@ export default function GuardianSummary() {
           <XaiBox title="Mengapa Anda tidak melihat zona atau alasan">
             <p>{sum.data.why_no_zone}</p>
           </XaiBox>
+          <AddChild onAdded={kids.reload} />
           <section className="card row between nowrap-row">
             <span>
               <span className="strong" style={{ display: "block" }}>

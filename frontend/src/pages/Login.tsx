@@ -14,16 +14,20 @@ export function AuthIntro() {
           رعاية
         </span>
         <h1>Pintu yang membawa siswa ke manusia yang peduli.</h1>
-        <p style={{ fontSize: 17, maxWidth: "46ch" }}>
-          Ri'ayah membantu sekolah dan kampus menyapa siswa yang menunjukkan tanda awal tertekan, sebelum masalahnya terlihat di nilai. Setiap penandaan membawa
-          alasan yang bisa dibaca, dan manusia yang memutuskan langkah berikutnya.
+        <p className="intro-copy">
+          Ri'ayah membantu guru menyadari lebih awal saat seorang siswa mulai kesulitan, misalnya makin sering absen atau tugasnya menumpuk, lalu mengajaknya ngobrol sebelum masalahnya
+          makin berat.
         </p>
+        <p className="intro-copy">Siswa selalu tahu alasannya, boleh menolak, dan yang memutuskan langkah berikutnya tetap manusia, bukan mesin.</p>
+        <Link to="/tentang" className="small strong" style={{ color: "var(--primary)" }}>
+          Mengapa namanya Ri'ayah? →
+        </Link>
       </div>
       <ul className="stack" style={{ listStyle: "none", padding: 0, margin: 0, gap: 12 }}>
         {[
-          ["Persetujuan dapat ditarik", "Siswa memilih data mana yang boleh dibaca, dan bisa berubah pikiran kapan saja."],
-          ["Tanpa penginderaan pasif", "Tidak membaca pesan, media sosial, lokasi, atau keimanan."],
-          ["Alasan terbuka", "Siswa dan guru membaca alasan yang sama dalam kalimat yang sama."],
+          ["Siswa yang memutuskan", "Siswa memilih data apa yang boleh dibaca, dan bisa berubah pikiran kapan saja."],
+          ["Tidak memata-matai", "Tidak membaca pesan, media sosial, lokasi, atau ibadah siswa."],
+          ["Tidak ada yang dirahasiakan", "Siswa dan guru membaca alasan yang sama, dengan kalimat yang sama."],
         ].map(([t, d]) => (
           <li key={t} className="row nowrap-row" style={{ alignItems: "flex-start", gap: 12 }}>
             <ShieldCheck aria-hidden style={{ width: 22, height: 22, color: "var(--xai)", flex: "none", marginTop: 2 }} />
@@ -101,7 +105,7 @@ export default function Login() {
         <div className="auth-card stack" style={{ gap: 20 }}>
           <div className="stack" style={{ gap: 6 }}>
             <h2 style={{ fontSize: 24 }}>Masuk</h2>
-            <p>Gunakan email dan kata sandi akun Anda. Setiap peran hanya melihat layar miliknya.</p>
+            <p>Masuk dengan email atau nomor induk, dan kata sandi Anda.</p>
           </div>
           {notice && <Banner kind="info">{notice}</Banner>}
           {error && (
@@ -112,9 +116,9 @@ export default function Login() {
           <form onSubmit={submit} className="stack" style={{ gap: 14 }} noValidate={false}>
             <div className="field">
               <label className="label" htmlFor="email">
-                Email
+                Email atau nomor induk
               </label>
-              <input id="email" name="email" className="input" type="email" inputMode="email" autoComplete="username" spellCheck={false} value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <input id="email" name="email" className="input" type="text" autoComplete="username" autoCapitalize="none" spellCheck={false} value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <PasswordField id="password" label="Kata sandi" autoComplete="current-password" value={password} onChange={setPassword} />
             <Button type="submit" loading={busy} block>
@@ -122,12 +126,24 @@ export default function Login() {
             </Button>
           </form>
           <hr className="divider" style={{ margin: 0 }} />
-          <p style={{ textAlign: "center" }}>
-            Belum punya akun?{" "}
-            <Link to="/daftar" className="strong" style={{ color: "var(--primary)" }}>
-              Daftar
+          <div className="stack" style={{ gap: 8 }}>
+            <p className="small strong" style={{ color: "var(--ink)" }}>
+              Baru pertama kali?
+            </p>
+            <Link to="/aktivasi" className="btn btn-ghost btn-block">
+              Siswa: aktifkan akun dengan kode dari sekolah
             </Link>
-          </p>
+            <Link to="/undangan" className="btn btn-ghost btn-block">
+              Orang tua: pakai kode undangan dari sekolah
+            </Link>
+            <p className="caption" style={{ textAlign: "center" }}>
+              Untuk mencoba tanpa kode,{" "}
+              <Link to="/daftar" style={{ color: "var(--primary)" }}>
+                daftar akun demo
+              </Link>
+              .
+            </p>
+          </div>
           <p className="caption" style={{ textAlign: "center" }}>
             Data di prototipe ini adalah SIMULASI. Di sekolah, masuk memakai SSO.
           </p>

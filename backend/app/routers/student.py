@@ -50,18 +50,20 @@ router = APIRouter(prefix="/api/me", tags=["siswa"])
 student_only = require_role("siswa")
 
 DATA_LABELS = {
-    "kehadiran": ("Kehadiran", "Jumlah hari hadir per pekan"),
-    "lms": ("Aktivitas belajar daring", "Berapa kali kamu membuka materi, bukan isinya"),
-    "tugas": ("Tugas terlambat", "Jumlah tugas yang terlambat dikumpulkan"),
+    "kehadiran": ("Kehadiran", "Berapa hari kamu masuk sekolah tiap minggu"),
+    "lms": ("Belajar online", "Berapa kali kamu membuka materi, bukan isinya"),
+    "tugas": ("Tugas telat", "Berapa tugas yang telat dikumpulkan"),
     "kuis": ("Nilai kuis", "Tren nilai, bukan peringkat"),
-    "checkin": ("Check-in mingguan", "Jawaban pertanyaan singkat yang kamu isi sendiri"),
+    "checkin": ("Check-in mingguan", "Jawaban 4 pertanyaan singkat tentang perasaanmu, kamu isi sendiri"),
     "bk_baca_checkin": ("Guru BK boleh membaca jawaban check-in", "Hanya guru BK, tidak pernah guru kelas"),
 }
 
 NOT_READ = ["Isi pesan dan percakapan", "Media sosial", "Lokasi dan aplikasi ponsel", "Keimanan atau ibadahmu"]
 
 ACTION_LABELS = {
-    "buka_kasus": "membuka detail pendampinganmu",
+    "buka_kasus": "membuka catatan pendampinganmu",
+    "baca_cerita": "membaca cerita tertulismu",
+    "balas_cerita": "membalas cerita tertulismu",
     "baca_checkin": "membaca jawaban check-in yang kamu izinkan",
     "tulis_catatan": "menulis catatan sesi",
     "catat_tindakan": "mencatat langkah pendampingan",
@@ -72,7 +74,7 @@ ACTION_LABELS = {
 ROLE_LABELS = {"guru": "Wali kelas", "bk": "Guru BK", "komite": "Komite etik", "siswa": "Kamu", "wali": "Wali", "admin": "Admin"}
 
 CHILD_SENTENCES = {
-    "kehadiran": "beberapa pekan ini kamu lebih sering tidak masuk sekolah",
+    "kehadiran": "beberapa minggu ini kamu lebih sering tidak masuk sekolah",
     "lms": "akhir-akhir ini kamu jarang membuka materi belajar",
     "tugas": "akhir-akhir ini beberapa tugasmu terlambat",
     "kuis": "akhir-akhir ini belajar sepertinya terasa lebih berat",
@@ -122,7 +124,7 @@ def _consent_view(db: Session, user: User) -> dict:
         "guardian_pending": guardian and not any(st[dt]["persetujuan"] for dt in DATA_LABELS),
         "any_granted": any(i["granted"] for i in items),
         "not_read": NOT_READ,
-        "purpose": "Satu tujuan saja: agar guru dan guru BK bisa menyapamu lebih awal bila beberapa hal berubah.",
+        "purpose": "Hanya satu tujuan: supaya guru bisa mengajakmu ngobrol lebih awal kalau ada yang berubah, sebelum masalahnya jadi berat.",
         "duration": "Berlaku sampai akhir Semester Ganjil 2026/2027. Kamu bisa mengubahnya kapan saja.",
         "history": [
             {
@@ -156,7 +158,7 @@ def home(user: User = Depends(student_only), db: Session = Depends(get_db)):
         message = {
             "case_id": case.id,
             "from": who,
-            "text": (f"{who} ingin ngobrol sebentar denganmu." if user.ui_mode == "anak" else f"Ada beberapa hal yang berubah. {who} ingin menyapa."),
+            "text": (f"{who} ingin ngobrol sebentar denganmu." if user.ui_mode == "anak" else f"{who} ingin ngobrol sebentar denganmu. Ini bukan karena kamu salah."),
         }
     picks = db.scalars(select(LibraryItem).where(LibraryItem.status == "terbit").order_by(LibraryItem.id).limit(3)).all()
     cv = _consent_view(db, user)
@@ -219,7 +221,7 @@ def flag(user: User = Depends(student_only), db: Session = Depends(get_db)):
     s = _subject_or_404(db, user)
     case = open_case_for(db, s.id)
     if case is None:
-        return {"zone": "hijau", "message": "Tidak ada penandaan saat ini. Kalau ingin cerita, pintu BK tetap terbuka."}
+        return {"zone": "hijau", "message": "Saat ini tidak ada yang perlu dikhawatirkan. Kalau ingin cerita, guru BK selalu siap mendengar."}
     who = _teacher_title(db, user, case)
     f = db.get(Flag, case.flag_id) if case.flag_id else None
     obj = db.scalars(select(Objection).where(Objection.case_id == case.id).order_by(Objection.id.desc())).first()
@@ -237,7 +239,7 @@ def flag(user: User = Depends(student_only), db: Session = Depends(get_db)):
             "child": True,
             "case_id": case.id,
             "teacher": who,
-            "sentence": f"{who} ingin menyapamu karena {CHILD_SENTENCES.get(top, CHILD_SENTENCES['checkin'])}.",
+            "sentence": f"{who} ingin ngobrol denganmu karena {CHILD_SENTENCES.get(top, CHILD_SENTENCES['checkin'])}.",
             "response": case.student_response,
             "objection": objection,
         }
@@ -271,11 +273,11 @@ def respond(body: RespondIn, user: User = Depends(student_only), db: Session = D
     s = _subject_or_404(db, user)
     case = open_case_for(db, s.id)
     if case is None or case.zone != "kuning":
-        raise HTTPException(404, "Tidak ada sapaan yang menunggu")
+        raise HTTPException(404, "Tidak ada ajakan ngobrol yang menunggu")
     case.student_response = body.response
     from ..models import FollowUp
 
-    db.add(FollowUp(case_id=case.id, actor_id=user.id, action="tanggapan_siswa", outcome="Mau disapa" if body.response == "mau" else "Belum mau, sapaan ditunda"))
+    db.add(FollowUp(case_id=case.id, actor_id=user.id, action="tanggapan_siswa", outcome="Siswa mau diajak ngobrol" if body.response == "mau" else "Siswa belum mau, ditunda"))
     db.commit()
     return {"ok": True, "response": body.response}
 
@@ -289,8 +291,8 @@ def objection(body: ObjectionIn, user: User = Depends(student_only), db: Session
     s = _subject_or_404(db, user)
     case = open_case_for(db, s.id)
     if case is None:
-        raise HTTPException(404, "Tidak ada penandaan yang bisa disanggah")
-    text = body.statement.strip() or ("Itu tidak benar." if user.ui_mode == "anak" else "Penandaan ini tidak sesuai dengan keadaanku.")
+        raise HTTPException(404, "Tidak ada tanda yang bisa disanggah")
+    text = body.statement.strip() or ("Itu tidak benar." if user.ui_mode == "anak" else "Tanda ini tidak sesuai dengan keadaanku.")
     now = utcnow()
     o = Objection(case_id=case.id, student_id=user.id, statement=text[:2000], created_at=now, due_at=now + timedelta(days=14))
     case.status = "ditinjau"

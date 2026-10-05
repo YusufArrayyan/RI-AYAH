@@ -15,7 +15,7 @@ export default function TeacherGuide() {
   const { data, error, loading, reload } = useResource<Guide>("/api/teacher/guide");
   return (
     <>
-      <PageHead title="Panduan menyapa" sub="Kalimat yang menenangkan untuk membuka percakapan. Sapaan terbaik terdengar seperti Anda sendiri." />
+      <PageHead title="Panduan memulai obrolan" sub="Kalimat yang menenangkan untuk membuka obrolan. Obrolan terbaik terdengar seperti Anda sendiri, bukan seperti membaca naskah." />
       {loading && !data && <LoadingBlock />}
       {error && !data && <ErrorState error={error} onRetry={reload} />}
       {data && (
@@ -58,7 +58,7 @@ export default function TeacherGuide() {
             </section>
           </div>
           <section className="card stack" aria-labelledby="setelah">
-            <h2 id="setelah">Setelah menyapa</h2>
+            <h2 id="setelah">Setelah ngobrol</h2>
             <ol className="stack" style={{ margin: 0, paddingLeft: "1.3em", gap: 10 }}>
               {data.after.map((a) => (
                 <li key={a}>{a}</li>
@@ -66,7 +66,7 @@ export default function TeacherGuide() {
             </ol>
           </section>
           <Link to="/guru" className="btn btn-ghost" style={{ alignSelf: "flex-start" }}>
-            Kembali ke daftar sapaan
+            Kembali ke daftar siswa
           </Link>
         </div>
       )}

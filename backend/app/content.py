@@ -1,4 +1,4 @@
-"""Konten tetap: butir check-in contoh, panduan menyapa, dan protokol krisis.
+"""Konten tetap: butir check-in contoh, panduan memulai obrolan, dan protokol krisis.
 
 Semua konten di sini adalah DRAF dari perancang. Instrumen check-in belum dipilih (PRD 15.1
 butir 5); panduan dan protokol wajib ditinjau psikolog dan konselor sebelum rilis.
@@ -12,7 +12,7 @@ CHECKIN_CHOICES = [
 ]
 
 CHECKIN_ITEMS = [
-    {"id": "lelah", "text": "Dalam sepekan terakhir, seberapa sering kamu merasa sangat lelah, bahkan setelah istirahat?"},
+    {"id": "lelah", "text": "Dalam seminggu terakhir, seberapa sering kamu merasa sangat capek, bahkan setelah istirahat?"},
     {"id": "fokus", "text": "Seberapa sering kamu sulit memusatkan perhatian saat belajar?"},
     {"id": "sendiri", "text": "Seberapa sering kamu merasa sendirian, walau ada orang di sekitarmu?"},
     {"id": "tidur", "text": "Seberapa sering tidurmu terganggu?"},
@@ -20,7 +20,7 @@ CHECKIN_ITEMS = [
 
 SAFETY_ITEM = {
     "id": "aman",
-    "text": "Dalam sepekan terakhir, apakah ada saat kamu merasa tidak aman atau terpikir untuk menyakiti dirimu?",
+    "text": "Dalam seminggu terakhir, apakah ada saat kamu merasa tidak aman atau terpikir untuk menyakiti dirimu?",
     "choices": [{"value": True, "label": "Ya, ada"}, {"value": False, "label": "Tidak"}],
 }
 
@@ -29,9 +29,9 @@ CHECKIN_NOTE = "Contoh butir. Instrumen final dipilih psikolog dan harus berlise
 TEACHER_GUIDE = {
     "reviewed": False,
     "try": [
-        {"say": "“Nadia, Ibu perhatikan beberapa pekan ini kamu kelihatan lebih capek. Ibu cuma mau tahu kabarmu.”", "why": "Mulai dari kepedulian, bukan dari data."},
+        {"say": "“Nadia, Ibu perhatikan beberapa minggu ini kamu kelihatan lebih capek. Ibu cuma mau tahu kabarmu.”", "why": "Mulai dari kepedulian, bukan dari data."},
         {"say": "“Boleh cerita kalau mau. Kalau belum mau juga tidak apa-apa.”", "why": "Menolak harus terasa aman."},
-        {"say": "“Ada yang bisa Ibu bantu supaya pekan depan lebih ringan?”", "why": "Mengajak mencari langkah kecil bersama."},
+        {"say": "“Ada yang bisa Ibu bantu supaya minggu depan lebih ringan?”", "why": "Mengajak mencari langkah kecil bersama."},
         {"say": "“Kalau mau, Ibu bisa kenalkan ke Pak Rahman di BK. Kamu yang memutuskan.”", "why": "Rujukan sebagai pilihan."},
     ],
     "avoid": [
@@ -41,10 +41,10 @@ TEACHER_GUIDE = {
         {"say": "Menyapa di depan teman sekelas.", "why": "Privasi siswa hilang; pilih tempat yang tenang."},
     ],
     "after": [
-        "Catat di Ri'ayah bahwa Anda sudah menyapa. Pilih kode hasil saja, tanpa isi cerita.",
-        "Bila siswa belum mau, jadwalkan ulang dengan jarak minimal satu pekan.",
-        "Bila siswa setuju, teruskan ke BK dari halaman kasus.",
-        "Bila ada tanda bahaya (menyebut ingin menyakiti diri), tekan “Ada tanda bahaya”. BK siaga akan dihubungi.",
+        "Catat di Ri'ayah bahwa Anda sudah mengajak ngobrol. Cukup pilih hasilnya, jangan tulis isi cerita siswa.",
+        "Kalau siswa belum mau, coba lagi lain waktu, paling cepat seminggu kemudian.",
+        "Kalau siswa butuh bantuan lebih, teruskan ke guru BK dari halaman siswa itu.",
+        "Kalau siswa menyebut ingin menyakiti diri, tekan “Ada tanda bahaya”. Guru BK akan segera dihubungi.",
     ],
 }
 
@@ -57,6 +57,6 @@ CRISIS_PROTOCOL = [
 ]
 
 OUTCOME_CODES = {
-    "guru": ["Sudah menyapa, siswa baik-baik saja", "Sudah menyapa, siswa ingin cerita lagi", "Siswa belum mau", "Tidak bertemu siswa"],
+    "guru": ["Sudah ngobrol, siswa baik-baik saja", "Sudah ngobrol, siswa ingin cerita lagi", "Siswa belum mau", "Belum bertemu siswa"],
     "bk": ["Sesi pertama selesai", "Perlu sesi lanjutan", "Dirujuk ke layanan klinis", "Wali dihubungi", "Tidak memerlukan tindak lanjut"],
 }

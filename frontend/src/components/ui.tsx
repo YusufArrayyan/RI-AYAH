@@ -60,7 +60,7 @@ export function ZoneShape({ zone, size = 14 }: { zone: string; size?: number }) 
   );
 }
 
-const ZONE_TEXT: Record<string, string> = { hijau: "Hijau", kuning: "Kuning: sapaan", merah: "Merah: kontak BK" };
+const ZONE_TEXT: Record<string, string> = { hijau: "Hijau", kuning: "Kuning: perlu diajak ngobrol", merah: "Merah: segera dihubungi BK" };
 export function ZoneChip({ zone, note }: { zone: string; note?: string }) {
   const cls = zone === "merah" ? "chip-bad" : zone === "kuning" ? "chip-warn" : "chip-ok";
   return (
@@ -82,7 +82,7 @@ const STATUS_CLS: Record<string, string> = {
 };
 const STATUS_TXT: Record<string, string> = {
   baru: "Baru",
-  disapa: "Disapa",
+  disapa: "Sudah diajak ngobrol",
   ditindaklanjuti: "Ditindaklanjuti",
   ditutup: "Ditutup",
   terlambat: "Terlambat",
@@ -357,7 +357,7 @@ export function HumanNote({ children }: { children?: ReactNode }) {
   return (
     <p className="row nowrap-row small muted" style={{ gap: 8, alignItems: "flex-start" }}>
       <ShieldCheck aria-hidden style={{ width: 18, height: 18, flex: "none", color: "var(--xai)", marginTop: 2 }} />
-      <span>{children ?? "Penandaan ini bukan diagnosis. Manusia yang memutuskan langkah berikutnya, bukan sistem."}</span>
+      <span>{children ?? "Ini bukan diagnosis. Yang memutuskan langkah berikutnya tetap manusia, bukan sistem."}</span>
     </p>
   );
 }

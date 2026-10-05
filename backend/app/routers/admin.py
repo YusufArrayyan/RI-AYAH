@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+from datetime import date
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from fastapi.responses import PlainTextResponse
@@ -11,19 +12,22 @@ from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from .. import audit, rules
+from .. import audit, codes, rules
 from ..access import subject_for
 from ..analytics import estimate_load
 from ..db import get_db
 from ..models import (
+    AccessCode,
     EmergencyContact,
     ImportJob,
     Institution,
+    KeyMapping,
     LibraryItem,
     Relation,
     RuleVersion,
     ServiceHours,
     Setting,
+    Subject,
     User,
     WeeklyIndicator,
 )
@@ -40,9 +44,9 @@ approver = require_role("admin", "komite")
 
 FIELDS = {
     "nis": {"label": "Nomor induk siswa", "hint": "Dipseudonimkan saat masuk", "aliases": ("nis", "nim", "nisn", "no_induk")},
-    "pekan": {"label": "Pekan ke-", "hint": "Bilangan bulat ≥ 1", "aliases": ("pekan", "minggu", "week")},
+    "pekan": {"label": "Minggu ke-", "hint": "Bilangan bulat ≥ 1", "aliases": ("pekan", "minggu", "week")},
     "kehadiran": {"label": "Kehadiran (hari)", "hint": "0 sampai 5", "aliases": ("kehadiran", "hadir", "attendance")},
-    "lms": {"label": "Buka materi daring", "hint": "Jumlah, ≥ 0", "aliases": ("lms", "buka_materi", "akses_lms")},
+    "lms": {"label": "Buka materi online", "hint": "Jumlah, ≥ 0", "aliases": ("lms", "buka_materi", "akses_lms")},
     "tugas": {"label": "Tugas terlambat", "hint": "Jumlah, ≥ 0", "aliases": ("tugas", "tugas_terlambat", "late")},
     "kuis": {"label": "Nilai kuis", "hint": "0 sampai 100", "aliases": ("kuis", "nilai_kuis", "quiz")},
 }
@@ -320,21 +324,30 @@ def users(role: str = "", q: str = "", user: User = Depends(admin_only), db: Ses
 
 class UserIn(BaseModel):
     name: str
-    email: str
+    email: str = ""
     role: str
     class_name: str | None = None
+    # khusus siswa
+    nis: str | None = None
+    level: str | None = None
+    birth_date: date | None = None
 
 
 @router.post("/users")
 def create_user(body: UserIn, user: User = Depends(admin_only), db: Session = Depends(get_db)):
     if body.role not in ROLE_NAMES:
         raise HTTPException(422, "Peran tidak dikenal")
+    if body.role == "wali":
+        raise HTTPException(422, "Orang tua tidak dibuat manual. Buat kode undangan di halaman Kode akses.")
+    import secrets
+
+    if body.role == "siswa":
+        return _create_student(body, user, db)
     email = body.email.strip().lower()
     if "@" not in email:
         raise HTTPException(422, "Email tidak valid")
     if db.scalar(select(User).where(User.email == email)):
         raise HTTPException(409, "Email sudah terdaftar")
-    import secrets
 
     temp_password = secrets.token_urlsafe(9)
     u = User(
@@ -353,6 +366,48 @@ def create_user(body: UserIn, user: User = Depends(admin_only), db: Session = De
     db.commit()
     # Kata sandi sementara ditampilkan sekali kepada admin; produksi memakai SSO.
     return {"ok": True, "id": u.id, "temp_password": temp_password}
+
+
+def _create_student(body: UserIn, user: User, db: Session) -> dict:
+    """Siswa dibuat sekolah (seperti dari Dapodik), lalu mengaktifkan akun dengan kode."""
+    import secrets
+
+    nis = (body.nis or "").strip().upper()
+    if not nis or db.scalar(select(User.id).where(User.nis == nis)):
+        raise HTTPException(422 if not nis else 409, "Nomor induk wajib diisi" if not nis else "Nomor induk sudah terdaftar")
+    if body.level not in ("sd", "smp", "sma", "kampus") or not (body.class_name or "").strip() or body.birth_date is None:
+        raise HTTPException(422, "Lengkapi jenjang, kelas, dan tanggal lahir siswa")
+    email = body.email.strip().lower() or f"{nis.lower()}@siswa.sekolah.local"
+    if db.scalar(select(User.id).where(User.email == email)):
+        raise HTTPException(409, "Email sudah terdaftar")
+    name = " ".join(body.name.split())
+    u = User(
+        email=email,
+        password_hash=hash_password(secrets.token_urlsafe(24)),
+        name=name,
+        nickname=name.split(" ")[0],
+        role="siswa",
+        nis=nis,
+        level=body.level,
+        class_name=body.class_name.strip(),
+        birth_date=body.birth_date,
+        ui_mode={"sd": "anak", "kampus": "kampus"}.get(body.level, "remaja"),
+        institution_id=user.institution_id,
+    )
+    db.add(u)
+    db.flush()
+    while True:
+        code = "S-" + secrets.token_hex(2).upper()
+        if not db.scalar(select(Subject.id).where(Subject.code == code)):
+            break
+    sub = Subject(code=code, class_name=u.class_name, level=u.level)
+    db.add(sub)
+    db.flush()
+    db.add(KeyMapping(user_id=u.id, subject_id=sub.id))
+    ac = codes.issue(db, student=u, kind="aktivasi", by=user)
+    audit.write(db, user, "tambah_pengguna", "pengguna", u.id, "Siswa", commit=False)
+    db.commit()
+    return {"ok": True, "id": u.id, "activation_code": ac.code}
 
 
 class UserPatch(BaseModel):
@@ -449,6 +504,67 @@ def end_relation(rid: int, user: User = Depends(admin_only), db: Session = Depen
     return {"ok": True}
 
 
+# ── Kode akses (aktivasi siswa dan undangan orang tua) ───────────────────────
+
+
+@router.get("/codes")
+def list_codes(class_name: str = "", user: User = Depends(admin_only), db: Session = Depends(get_db)):
+    classes = sorted({c for c in db.scalars(select(User.class_name).where(User.role == "siswa", User.class_name.is_not(None)))})
+    cls = class_name or (classes[0] if classes else "")
+    students = db.scalars(select(User).where(User.role == "siswa", User.class_name == cls).order_by(User.name)).all()
+    all_codes = db.scalars(select(AccessCode).where(AccessCode.student_id.in_([s.id for s in students] or [-1])).order_by(AccessCode.id)).all()
+    latest: dict[tuple[int, str], AccessCode] = {}
+    for c in all_codes:
+        latest[(c.student_id, c.kind)] = c
+    guardians = {
+        r.student_id
+        for r in db.scalars(select(Relation).where(Relation.kind == "wali", Relation.status == "aktif", Relation.student_id.in_([s.id for s in students] or [-1])))
+    }
+    inst = db.get(Institution, user.institution_id)
+    rows = []
+    for s in students:
+        row = {"id": s.id, "name": s.name, "nis": s.nis, "class_name": s.class_name, "level": s.level, "has_guardian": s.id in guardians}
+        for kind in ("aktivasi", "undangan_wali"):
+            c = latest.get((s.id, kind))
+            row[kind] = {"code": c.code if c and codes.status_of(c) == "aktif" else None, "status": codes.status_of(c), "expires_at": c.expires_at.isoformat() if c else None, "id": c.id if c else None}
+        rows.append(row)
+    return {"classes": classes, "class_name": cls, "rows": rows, "institution": inst.name if inst else "", "valid_days": codes.VALID_DAYS}
+
+
+class IssueIn(BaseModel):
+    kind: str
+    student_ids: list[int]
+
+
+@router.post("/codes")
+def issue_codes(body: IssueIn, user: User = Depends(admin_only), db: Session = Depends(get_db)):
+    if body.kind not in ("aktivasi", "undangan_wali"):
+        raise HTTPException(422, "Jenis kode tidak dikenal")
+    if not body.student_ids or len(body.student_ids) > 300:
+        raise HTTPException(422, "Pilih 1 sampai 300 siswa")
+    issued = 0
+    for sid in body.student_ids:
+        s = db.get(User, sid)
+        if s is None or s.role != "siswa":
+            continue
+        codes.issue(db, student=s, kind=body.kind, by=user)
+        issued += 1
+    audit.write(db, user, "buat_kode_akses", "kode", body.kind, f"{issued} kode", commit=False)
+    db.commit()
+    return {"ok": True, "issued": issued}
+
+
+@router.post("/codes/{cid}/revoke")
+def revoke_code(cid: int, user: User = Depends(admin_only), db: Session = Depends(get_db)):
+    c = db.get(AccessCode, cid)
+    if c is None:
+        raise HTTPException(404, "Kode tidak ditemukan")
+    c.revoked = True
+    audit.write(db, user, "cabut_kode_akses", "kode", c.id, c.kind, commit=False)
+    db.commit()
+    return {"ok": True}
+
+
 # ── A3 Aturan dan ambang ────────────────────────────────────────────────────
 
 PARAM_SPECS = {
@@ -462,9 +578,9 @@ PARAM_SPECS = {
 }
 RULE_TEXT = {
     "M1": "Tombol bantuan atau butir keselamatan memberi zona merah",
-    "K1": "Dua atau lebih indikator memburuk tiga pekan berturut-turut memberi kuning",
+    "K1": "Dua atau lebih indikator memburuk tiga minggu berturut-turut memberi kuning",
     "K2": "Skor check-in sama atau di atas ambang memberi kuning (hanya bila siswa ikut check-in)",
-    "L": "Pelepasan tanda: indikator membaik dua pekan berturut-turut",
+    "L": "Pelepasan tanda: indikator membaik dua minggu berturut-turut",
 }
 
 

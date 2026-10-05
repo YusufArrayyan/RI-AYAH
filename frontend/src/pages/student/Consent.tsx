@@ -85,12 +85,12 @@ export default function Consent() {
           </section>
           <SeenPanel seen={seen} notSeen={data.not_read} />
           <section className="card stack" style={{ gap: 6 }}>
-            <h2 style={{ fontSize: 17 }}>Bagaimana kami membaca?</h2>
+            <h2 style={{ fontSize: 17 }}>Bagaimana cara kerjanya?</h2>
             <p className="small">
-              Kami hanya membaca <strong className="strong">tren</strong> mingguan, misalnya kehadiran yang turun beberapa pekan berturut-turut. Bila ada perubahan, wali
-              kelasmu mendapat ajakan untuk menyapa. Kamu bisa melihat alasannya, dan menolak sapaan tanpa akibat.
+              Kami hanya melihat <strong className="strong">perubahan dari minggu ke minggu</strong>, misalnya kehadiran yang terus turun. Kalau ada perubahan, wali kelasmu akan
+              mengajakmu ngobrol. Kamu bisa melihat alasannya, dan boleh menolak tanpa akibat apa pun.
             </p>
-            <p className="small">Data ini tidak pernah dipakai untuk nilai, sanksi, seleksi, atau beasiswa.</p>
+            <p className="small">Data ini tidak pernah dipakai untuk nilai, hukuman, seleksi, atau beasiswa.</p>
           </section>
           <div className="choice-row two">
             <Link to="/siswa" className="btn btn-ghost">
@@ -172,7 +172,7 @@ export default function Consent() {
             {data.history.slice(0, 12).map((h, idx) => (
               <li key={idx} className="small">
                 <strong className="strong">{h.label}</strong>: {h.granted ? "diizinkan" : "dicabut"} oleh {h.by}
-                {h.kind === "asen" ? " (asen)" : ""} · <span className="muted">{fmtDateTime(h.at)}</span>
+                {h.kind === "asen" ? " (persetujuanmu)" : ""} · <span className="muted">{fmtDateTime(h.at)}</span>
               </li>
             ))}
           </ul>

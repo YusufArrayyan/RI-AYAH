@@ -40,7 +40,7 @@ const TEST_INFO: Record<string, { title: string; q: string }> = {
   kesetiaan: { title: "Kesetiaan", q: "Apakah penjelasan sama dengan aturan yang benar-benar dijalankan?" },
   stabilitas: { title: "Stabilitas", q: "Apakah data yang mirip memberi alasan yang sama?" },
   keterpahaman: { title: "Keterpahaman", q: "Apakah siswa dan guru memahami alasan?" },
-  akurasi_kontrafaktual: { title: "Akurasi kontrafaktual", q: "Apakah mengikuti saran benar-benar melepas penandaan?" },
+  akurasi_kontrafaktual: { title: "Akurasi kontrafaktual", q: "Apakah mengikuti saran benar-benar melepas tanda?" },
 };
 
 /** E4 Registri aturan dan XAI. */

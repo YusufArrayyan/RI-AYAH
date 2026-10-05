@@ -191,23 +191,23 @@ export default function Rules() {
                 <h2 id="est">Estimator beban</h2>
                 {estBusy && <span className="caption">Menghitung…</span>}
               </div>
-              <p className="small muted">Aturan dijalankan ulang pada data empat pekan terakhir. Garis hitam: kapasitas BK per pekan.</p>
+              <p className="small muted">Aturan dijalankan ulang pada data empat minggu terakhir. Garis hitam: kapasitas BK per minggu.</p>
               {e.per_week.map((p) => (
-                <HBar key={p.week} label={`Pekan ${p.week}`} value={p.new_cases} max={maxBar} mark={e.capacity} display={`${p.new_cases}`} tone={p.new_cases > e.capacity ? "bad" : undefined} />
+                <HBar key={p.week} label={`Minggu ${p.week}`} value={p.new_cases} max={maxBar} mark={e.capacity} display={`${p.new_cases}`} tone={p.new_cases > e.capacity ? "bad" : undefined} />
               ))}
               <p className="strong">
-                Rata-rata {fmtNum(e.average)} kasus baru per pekan · kapasitas {e.capacity}
+                Rata-rata {fmtNum(e.average)} kasus baru per minggu · kapasitas {e.capacity}
               </p>
-              {e.over_capacity && <Banner kind="bad">Ambang ini menghasilkan beban di atas 85% kapasitas. Sapaan berisiko menjadi formalitas.</Banner>}
+              {e.over_capacity && <Banner kind="bad">Ambang ini membuat beban di atas 85% kapasitas. Obrolan berisiko jadi sekadar formalitas.</Banner>}
             </section>
             <XaiBox title="Akibat ambang">
-              <p>Menurunkan jumlah pekan K1 atau ambang K2 menandai lebih banyak siswa lebih awal, tetapi menambah beban guru dan BK. Estimator memakai aturan yang sama dengan yang berjalan.</p>
+              <p>Menurunkan jumlah minggu K1 atau ambang K2 menandai lebih banyak siswa lebih awal, tetapi menambah beban guru dan BK. Estimator memakai aturan yang sama dengan yang berjalan.</p>
             </XaiBox>
             <section className="card stack">
               <label className="label" htmlFor="why">
                 Alasan perubahan
               </label>
-              <textarea id="why" className="textarea" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Misalnya: beban BK di atas 85% dua pekan…" />
+              <textarea id="why" className="textarea" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Misalnya: beban BK di atas 85% dua minggu…" />
               <div className="choice-row two">
                 <Button variant="ghost" onClick={() => save(false)} loading={busy === "draft"} disabled={!anyChanged || reason.trim().length < 10}>
                   Simpan draf

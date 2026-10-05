@@ -22,12 +22,13 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from .. import audit
+from .. import audit, codes
 from ..access import age_on, needs_reconfirm
 from ..config import settings
 from ..db import get_db
-from ..models import Institution, KeyMapping, Relation, Subject, User
+from ..models import AccessCode, Institution, KeyMapping, Relation, Subject, User
 from ..security import create_token, current_user, hash_password, verify_password
+from ..timeutil import utcnow
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -67,9 +68,14 @@ def _session(db: Session, u: User) -> dict:
 
 @router.post("/login")
 def login(body: LoginIn, db: Session = Depends(get_db)):
-    u = db.scalar(select(User).where(User.email == body.email.strip().lower()))
+    """`email` boleh berisi email atau nomor induk (siswa SD sering belum punya email)."""
+    ident = body.email.strip()
+    if "@" in ident:
+        u = db.scalar(select(User).where(User.email == ident.lower()))
+    else:
+        u = db.scalar(select(User).where(User.nis == ident.upper(), User.role == "siswa"))
     if u is None or not verify_password(body.password, u.password_hash):
-        raise HTTPException(401, "Email atau kata sandi tidak cocok")
+        raise HTTPException(401, "Email/nomor induk atau kata sandi tidak cocok")
     if u.pending_approval:
         raise HTTPException(403, "Akun Anda masih menunggu persetujuan admin sekolah.")
     if not u.active:
@@ -174,6 +180,94 @@ def register(body: RegisterIn, db: Session = Depends(get_db)):
     if u.pending_approval:
         return {"pending": True, "message": "Pendaftaran terkirim. Admin sekolah perlu menyetujui akun Anda sebelum bisa masuk."}
     return {"pending": False, **_session(db, u)}
+
+
+# ── Kode dari sekolah ───────────────────────────────────────────────────────
+
+
+@router.get("/code-info")
+def code_info(code: str, db: Session = Depends(get_db)):
+    """Pratinjau kode sebelum dipakai: hanya nama panggilan dan kelas, tanpa data lain."""
+    ac = db.scalar(select(AccessCode).where(AccessCode.code == codes.normalize(code)))
+    st = codes.status_of(ac)
+    if ac is None or st != "aktif":
+        return {"valid": False, "status": st}
+    s = db.get(User, ac.student_id)
+    return {"valid": True, "kind": ac.kind, "student": {"nickname": s.nickname, "class_name": s.class_name}}
+
+
+class ActivateIn(BaseModel):
+    nis: str
+    code: str
+    password: str
+    email: str | None = None
+
+
+@router.post("/activate")
+def activate(body: ActivateIn, db: Session = Depends(get_db)):
+    """Siswa mengaktifkan akun yang sudah dibuat sekolah. Juga dipakai bila lupa kata sandi."""
+    student = db.scalar(select(User).where(User.nis == body.nis.strip().upper(), User.role == "siswa"))
+    ac = codes.redeem(db, body.code, "aktivasi")
+    if student is None or ac.student_id != student.id:
+        raise HTTPException(422, "Nomor induk dan kode tidak cocok. Periksa kartu dari wali kelas.")
+    if len(body.password) < 8:
+        raise HTTPException(422, "Kata sandi minimal 8 karakter")
+    if body.email and body.email.strip():
+        email = body.email.strip().lower()
+        if not EMAIL_RE.match(email):
+            raise HTTPException(422, "Format email tidak valid")
+        other = db.scalar(select(User).where(User.email == email, User.id != student.id))
+        if other:
+            raise HTTPException(409, "Email ini sudah dipakai akun lain")
+        student.email = email
+    student.password_hash = hash_password(body.password)
+    student.active = True
+    ac.used_at, ac.used_by = utcnow(), student.id
+    audit.write(db, student, "aktivasi_akun", "pengguna", student.id, commit=False)
+    db.commit()
+    return _session(db, student)
+
+
+class InviteIn(BaseModel):
+    code: str
+    name: str
+    email: str
+    password: str
+
+
+def link_guardian(db: Session, guardian: User, ac: AccessCode) -> User:
+    child = db.get(User, ac.student_id)
+    existing = db.scalar(select(Relation).where(Relation.actor_id == guardian.id, Relation.student_id == child.id, Relation.kind == "wali"))
+    if existing:
+        existing.status, existing.approved_by = "aktif", ac.created_by
+    else:
+        db.add(Relation(actor_id=guardian.id, student_id=child.id, kind="wali", status="aktif", proposed_by=ac.created_by, approved_by=ac.created_by))
+    ac.used_at, ac.used_by = utcnow(), guardian.id
+    audit.write(db, guardian, "terima_undangan_wali", "siswa", child.id, "Terhubung lewat kode sekolah", commit=False)
+    return child
+
+
+@router.post("/accept-invite", status_code=201)
+def accept_invite(body: InviteIn, db: Session = Depends(get_db)):
+    """Orang tua membuat akun dari kode undangan sekolah; langsung terhubung ke anaknya."""
+    ac = codes.redeem(db, body.code, "undangan_wali")
+    name = " ".join(body.name.split())
+    email = body.email.strip().lower()
+    if len(name) < 3:
+        raise HTTPException(422, "Nama lengkap minimal 3 huruf")
+    if not EMAIL_RE.match(email):
+        raise HTTPException(422, "Format email tidak valid")
+    if len(body.password) < 8:
+        raise HTTPException(422, "Kata sandi minimal 8 karakter")
+    if db.scalar(select(User.id).where(User.email == email)):
+        raise HTTPException(409, "Email ini sudah punya akun. Masuk dulu, lalu tambahkan anak dengan kode ini di halaman Ringkasan.")
+    inst = db.scalar(select(Institution).order_by(Institution.id))
+    g = User(email=email, password_hash=hash_password(body.password), name=name, nickname=name.split(" ")[0], title=name.split(" ")[0], role="wali", institution_id=inst.id)
+    db.add(g)
+    db.flush()
+    link_guardian(db, g, ac)
+    db.commit()
+    return _session(db, g)
 
 
 @router.get("/me")

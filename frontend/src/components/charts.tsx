@@ -58,7 +58,7 @@ export function TrendChart({
           <g>
             <rect x={x(tf) - 6} y={4} width={x(last) - x(tf) + 12} height={H - 4 - padBottom + 6} rx={6} fill="var(--warn-soft)" />
             <text x={x(tf) - 2} y={15} fontSize="11" fontWeight="700" fill="var(--warn-text)">
-              Memicu penandaan
+              Yang memicu tanda
             </text>
           </g>
         )}

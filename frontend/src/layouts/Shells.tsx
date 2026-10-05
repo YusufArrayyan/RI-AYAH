@@ -21,6 +21,8 @@ import {
   ChartColumn,
   Inbox,
   Gavel,
+  MessageCircleHeart,
+  Ticket,
   Phone,
   X,
 } from "lucide-react";
@@ -97,13 +99,15 @@ export function StudentShell() {
   const nav: NavItem[] = child
     ? [
         { to: "/siswa", label: "Beranda", icon: <House aria-hidden />, end: true },
+        { to: "/siswa/cerita", label: "Cerita", icon: <MessageCircleHeart aria-hidden /> },
         { to: "/siswa/pustaka", label: "Bacaan", icon: <BookOpen aria-hidden /> },
         { to: "/siswa/privasi", label: "Dataku", icon: <KeyRound aria-hidden /> },
       ]
     : [
         { to: "/siswa", label: "Beranda", icon: <House aria-hidden />, end: true },
         { to: "/siswa/checkin", label: "Check-in", icon: <ClipboardCheck aria-hidden /> },
-        { to: "/siswa/pustaka", label: "Pustaka", icon: <BookOpen aria-hidden /> },
+        { to: "/siswa/cerita", label: "Cerita", icon: <MessageCircleHeart aria-hidden /> },
+        { to: "/siswa/pustaka", label: "Bacaan", icon: <BookOpen aria-hidden /> },
         { to: "/siswa/privasi", label: "Privasi", icon: <KeyRound aria-hidden /> },
       ];
   return (
@@ -215,8 +219,8 @@ const STAFF_NAV: Partial<Record<Role, { group?: string; items: NavItem[] }[]>> =
   guru: [
     {
       items: [
-        { to: "/guru", label: "Daftar sapaan", icon: <MessageSquareText aria-hidden />, code: "G1", end: true },
-        { to: "/guru/panduan", label: "Panduan menyapa", icon: <HeartHandshake aria-hidden />, code: "G3" },
+        { to: "/guru", label: "Siswa yang perlu diajak ngobrol", icon: <MessageSquareText aria-hidden />, code: "G1", end: true },
+        { to: "/guru/panduan", label: "Panduan memulai obrolan", icon: <HeartHandshake aria-hidden />, code: "G3" },
       ],
     },
   ],
@@ -224,6 +228,7 @@ const STAFF_NAV: Partial<Record<Role, { group?: string; items: NavItem[] }[]>> =
     {
       items: [
         { to: "/bk", label: "Antrean kasus", icon: <Inbox aria-hidden />, code: "K1", end: true },
+        { to: "/bk/cerita", label: "Cerita siswa", icon: <MessageCircleHeart aria-hidden /> },
         { to: "/bk/protokol", label: "Protokol krisis", icon: <LifeBuoy aria-hidden />, code: "K3" },
         { to: "/bk/beban", label: "Beban layanan", icon: <Gauge aria-hidden />, code: "K4" },
         { to: "/bk/keberatan", label: "Keberatan siswa", icon: <Gavel aria-hidden />, code: "E3" },
@@ -236,6 +241,7 @@ const STAFF_NAV: Partial<Record<Role, { group?: string; items: NavItem[] }[]>> =
       items: [
         { to: "/admin", label: "Impor data", icon: <FileUp aria-hidden />, code: "A1", end: true },
         { to: "/admin/pengguna", label: "Pengguna dan relasi", icon: <Users aria-hidden />, code: "A2" },
+        { to: "/admin/kode", label: "Kode akses", icon: <Ticket aria-hidden /> },
       ],
     },
     {
@@ -287,7 +293,9 @@ export function StaffShell() {
   const [open, setOpen] = useState(false);
   const loc = useLocation();
   const nav = useNavigate();
-  useEffect(() => setOpen(false), [loc.pathname]);
+  useEffect(() => {
+    setOpen(false);
+  }, [loc.pathname]);
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);

@@ -37,7 +37,7 @@ export default function Checkin() {
         <h1>Check-in mingguan</h1>
         <div className="card">
           <EmptyState icon={<Lock aria-hidden />} title="Check-in belum aktif" action={<Link to="/siswa/persetujuan" className="btn btn-ghost">Buka persetujuan</Link>}>
-            Check-in sepenuhnya sukarela. Aktifkan bila kamu mau, atau biarkan mati. Tidak ada akibat apa pun.
+            Check-in tidak wajib. Aktifkan kalau kamu mau, atau biarkan mati. Tidak ada akibat apa pun.
           </EmptyState>
         </div>
       </>
@@ -48,7 +48,7 @@ export default function Checkin() {
       <>
         <h1>Check-in mingguan</h1>
         <div className="card">
-          <EmptyState icon={<CircleCheck aria-hidden />} title="Check-in pekan ini sudah terisi" action={<Button variant="ghost" onClick={() => setRedo(true)}>Isi ulang</Button>}>
+          <EmptyState icon={<CircleCheck aria-hidden />} title="Check-in minggu ini sudah terisi" action={<Button variant="ghost" onClick={() => setRedo(true)}>Isi ulang</Button>}>
             Terima kasih. Jawabanmu tersimpan terenkripsi{data.bk_can_read ? " dan hanya terbaca guru BK" : " dan tidak dibaca siapa pun selain sistem"}.
           </EmptyState>
         </div>

@@ -186,7 +186,7 @@ export default function Privacy() {
             <label className="label" htmlFor="fix">
               Data apa yang keliru?
             </label>
-            <textarea id="fix" className="textarea" value={fixText} onChange={(e) => setFixText(e.target.value)} placeholder="Contoh: Kehadiran pekan 6 tercatat 2 hari, seharusnya 4…" />
+            <textarea id="fix" className="textarea" value={fixText} onChange={(e) => setFixText(e.target.value)} placeholder="Contoh: Kehadiran minggu ke-6 tercatat 2 hari, seharusnya 4…" />
             <div className="choice-row two">
               <Button variant="ghost" onClick={() => setFixOpen(false)}>
                 Batal

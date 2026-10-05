@@ -81,7 +81,7 @@ def cases(class_name: str = "", user: User = Depends(teacher_only), db: Session 
         },
         "classes": classes,
         "rows": out,
-        "note": "Nama siswa tampil setelah Anda membuka kasus. Setiap pembukaan tercatat.",
+        "note": "Nama siswa baru muncul setelah Anda membukanya. Setiap kali dibuka, tercatat dan bisa dilihat siswa.",
     }
 
 
@@ -136,7 +136,7 @@ def action(case_id: int, body: ActionIn, user: User = Depends(teacher_only), db:
     now = utcnow()
     if body.action == "disapa":
         if body.outcome not in content.OUTCOME_CODES["guru"]:
-            raise HTTPException(422, "Pilih kode hasil sapaan")
+            raise HTTPException(422, "Pilih hasil obrolan dulu")
         c.status = "disapa"
         c.first_contact_at = c.first_contact_at or now
         db.add(FollowUp(case_id=c.id, actor_id=user.id, action="disapa", outcome=body.outcome))
@@ -154,7 +154,7 @@ def action(case_id: int, body: ActionIn, user: User = Depends(teacher_only), db:
     elif body.action == "tanda_bahaya":
         s = db.get(Subject, c.subject_id)
         reason = rules.ReasonOut(
-            "bantuan", "Tanda bahaya", "Wali kelas melihat tanda bahaya saat menyapa.", "Dilaporkan dari sapaan guru", [], None, 1.0
+            "bantuan", "Tanda bahaya", "Wali kelas melihat tanda bahaya saat mengobrol dengan siswa.", "Dilaporkan wali kelas", [], None, 1.0
         )
         ev = rules.Evaluation("merah", "M1", [reason])
         create_flag_and_case(db, s, ev, week=db.get(Flag, c.flag_id).week if c.flag_id else 0)

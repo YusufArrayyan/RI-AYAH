@@ -145,7 +145,7 @@ export default function Resources() {
         <div className="layout-2col">
           <section className="card flush" aria-labelledby="pustaka">
             <div style={{ padding: "16px 16px 4px" }}>
-              <h2 id="pustaka">Pustaka dukungan</h2>
+              <h2 id="pustaka">Bacaan dan latihan</h2>
               <p className="small muted">Konten draf tidak terbit. Konten harus ditinjau konselor sebelum terbit; sumber daya Islami selalu bersifat pilihan.</p>
             </div>
             <ul className="list">

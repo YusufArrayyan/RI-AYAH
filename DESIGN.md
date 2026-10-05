@@ -314,6 +314,26 @@ Transisi 150 sampai 250 ms hanya untuk perubahan keadaan (saklar, tab, laci, dia
 
 Kata "memantau", "pengawasan", "pasien", "bermasalah", dan "berisiko" tidak muncul di antarmuka.
 
+### Kosakata sehari-hari (layar siswa, orang tua, guru)
+
+| Istilah PRD | Yang tampil di layar |
+|---|---|
+| menyapa, sapaan | mengajak ngobrol, ngobrol |
+| ditandai, penandaan | ada perubahan yang kami lihat, tanda |
+| Kuning: sapaan / Merah: kontak BK | Kuning: perlu diajak ngobrol / Merah: segera dihubungi BK |
+| kontrafaktual | Kapan tanda ini hilang? |
+| asen anak | persetujuan anak |
+| pekan | minggu |
+| aktivitas belajar daring, tugas terlambat | belajar online, tugas telat |
+| pustaka dukungan | bacaan dan latihan |
+| kode hasil tindak lanjut | hasil obrolan (tanpa isi cerita) |
+
+Istilah teknis (K1, K2, kontrafaktual, XAI) tetap dipakai di layar BK, admin, dan komite karena dibutuhkan untuk audit.
+
+### Paragraf
+
+Rata kiri, tidak rata kiri-kanan (justify): justify membuat jarak antarkata tidak rata di layar sempit dan menyulitkan pembaca disleksia (WCAG 1.4.8). Kerapian dicapai dengan lebar baris 42–65 karakter, tinggi baris 1,6–1,7, dan `text-wrap: pretty`.
+
 ## Do's and Don'ts
 
 ### Do

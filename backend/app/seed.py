@@ -225,10 +225,10 @@ def seed(db: Session) -> None:
         [
             RuleVersion(rule_id="M1", version=1, params={"response_hours": 24}, status="aktif", reason="Usulan awal dari PRD v1", owner="BK dan psikolog", proposed_by=teguh.id, approved_by=hasan.id, created_at=t0, decided_at=t0),
             RuleVersion(rule_id="K1", version=1, params={"min_indicators": 2, "weeks": 4}, status="arsip", reason="Usulan awal PRD v1", owner="Psikolog, guru, BK", proposed_by=teguh.id, approved_by=hasan.id, created_at=t0, decided_at=t0),
-            RuleVersion(rule_id="K1", version=2, params={"min_indicators": 2, "weeks": 3}, status="aktif", reason="Empat pekan terlalu lambat menurut konselor; diturunkan ke tiga pekan", owner="Psikolog, guru, BK", proposed_by=teguh.id, approved_by=hasan.id, created_at=t0 + timedelta(days=20), decided_at=t0 + timedelta(days=22)),
+            RuleVersion(rule_id="K1", version=2, params={"min_indicators": 2, "weeks": 3}, status="aktif", reason="Empat minggu terlalu lambat menurut konselor; diturunkan ke tiga minggu", owner="Psikolog, guru, BK", proposed_by=teguh.id, approved_by=hasan.id, created_at=t0 + timedelta(days=20), decided_at=t0 + timedelta(days=22)),
             RuleVersion(rule_id="K2", version=1, params={"threshold": 8, "max": 12}, status="aktif", reason="Placeholder; instrumen belum dipilih", owner="Psikolog", proposed_by=teguh.id, approved_by=hasan.id, created_at=t0, decided_at=t0),
             RuleVersion(rule_id="L", version=1, params={"weeks": 2}, status="aktif", reason="Usulan awal", owner="Psikolog, komite", proposed_by=teguh.id, approved_by=hasan.id, created_at=t0, decided_at=t0),
-            RuleVersion(rule_id="K2", version=2, params={"threshold": 9, "max": 12}, status="diajukan", reason="Beban BK di atas 85% dua pekan; usul ambang check-in dinaikkan satu poin sambil menunggu instrumen final", owner="Psikolog", proposed_by=teguh.id, created_at=now - timedelta(days=2)),
+            RuleVersion(rule_id="K2", version=2, params={"threshold": 9, "max": 12}, status="diajukan", reason="Beban BK di atas 85% dua minggu; usul ambang check-in dinaikkan satu poin sambil menunggu instrumen final", owner="Psikolog", proposed_by=teguh.id, created_at=now - timedelta(days=2)),
         ]
     )
     db.flush()
@@ -392,12 +392,12 @@ def seed(db: Session) -> None:
         if i % 4 == 0:
             c.status = "disapa"
             c.first_contact_at = c.created_at + timedelta(days=RNG.randint(1, 5))
-            db.add(FollowUp(case_id=c.id, actor_id=owner.id if owner else None, action="disapa", outcome="Sudah menyapa, siswa ingin cerita lagi", at=c.first_contact_at))
+            db.add(FollowUp(case_id=c.id, actor_id=owner.id if owner else None, action="disapa", outcome="Sudah ngobrol, siswa ingin cerita lagi", at=c.first_contact_at))
         elif i % 4 == 1 and i < 6:
             c.status = "ditindaklanjuti"
             c.first_contact_at = c.created_at + timedelta(days=2)
             c.owner_id = maya.id
-            db.add(FollowUp(case_id=c.id, actor_id=sari.id, action="disapa", outcome="Sudah menyapa, siswa ingin cerita lagi", at=c.first_contact_at))
+            db.add(FollowUp(case_id=c.id, actor_id=sari.id, action="disapa", outcome="Sudah ngobrol, siswa ingin cerita lagi", at=c.first_contact_at))
             db.add(FollowUp(case_id=c.id, actor_id=sari.id, action="teruskan_bk", outcome="Diteruskan ke Bu Maya", at=c.first_contact_at + timedelta(hours=3)))
             db.add(CounselingNote(case_id=c.id, author_id=maya.id, content_enc=encrypt("Sesi pertama: siswa bercerita soal jadwal les yang padat dan kurang tidur. Sepakat menyusun jadwal belajar bersama pekan depan. (SIMULASI)"), label="Perlu sesi lanjutan", at=c.first_contact_at + timedelta(days=1)))
     # Satu keberatan menunggu di XII IPS 1.
@@ -461,7 +461,7 @@ def seed(db: Session) -> None:
         [
             DataRequest(student_id=some[0].id, requester_id=some[0].id, kind="hapus", status="diproses", detail="Siswa pindah sekolah", created_at=now - timedelta(days=5), due_at=now + timedelta(days=9)),
             DataRequest(student_id=some[1].id, requester_id=some[1].id, kind="lihat", status="selesai", created_at=now - timedelta(days=20), due_at=now - timedelta(days=6), done_at=now - timedelta(days=18)),
-            DataRequest(student_id=some[2].id, requester_id=some[2].id, kind="perbaiki", status="diajukan", detail="Kehadiran pekan 6 tercatat 2 hari, seharusnya 4 (izin sakit)", created_at=now - timedelta(days=16), due_at=now - timedelta(days=2)),
+            DataRequest(student_id=some[2].id, requester_id=some[2].id, kind="perbaiki", status="diajukan", detail="Kehadiran minggu ke-6 tercatat 2 hari, seharusnya 4 (izin sakit)", created_at=now - timedelta(days=16), due_at=now - timedelta(days=2)),
         ]
     )
     if guardians:

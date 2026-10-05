@@ -6,6 +6,8 @@ import { AuthProvider, ROLE_HOME, useAuth, type Role } from "./lib/auth";
 import { ToastProvider } from "./lib/toast";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import { AcceptInvite, Activate } from "./pages/Activate";
+import About from "./pages/About";
 
 // Siswa
 const StudentHome = lazy(() => import("./pages/student/Home"));
@@ -16,6 +18,9 @@ const Library = lazy(() => import("./pages/student/Library"));
 const LibraryItem = lazy(() => import("./pages/student/LibraryItem"));
 const Privacy = lazy(() => import("./pages/student/Privacy"));
 const HelpNow = lazy(() => import("./pages/student/HelpNow"));
+const StudentStories = lazy(() => import("./pages/student/Stories"));
+const CounselorStories = lazy(() => import("./pages/counselor/Stories"));
+const Codes = lazy(() => import("./pages/admin/Codes"));
 // Wali
 const GuardianSummary = lazy(() => import("./pages/guardian/Summary"));
 const GuardianConsent = lazy(() => import("./pages/guardian/Consent"));
@@ -72,6 +77,9 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/masuk" element={<Login />} />
             <Route path="/daftar" element={<Register />} />
+            <Route path="/aktivasi" element={<Activate />} />
+            <Route path="/undangan" element={<AcceptInvite />} />
+            <Route path="/tentang" element={<About />} />
 
             <Route
               path="/siswa"
@@ -89,6 +97,7 @@ export default function App() {
               <Route path="pustaka/:id" element={S(<LibraryItem />)} />
               <Route path="privasi" element={S(<Privacy />)} />
               <Route path="bantuan" element={S(<HelpNow />)} />
+              <Route path="cerita" element={S(<StudentStories />)} />
             </Route>
 
             <Route
@@ -120,9 +129,11 @@ export default function App() {
               <Route path="/bk/protokol" element={<Guard roles={["bk"]}>{S(<Protocol />)}</Guard>} />
               <Route path="/bk/beban" element={<Guard roles={["bk"]}>{S(<Load />)}</Guard>} />
               <Route path="/bk/keberatan" element={<Guard roles={["bk"]}>{S(<Objections />)}</Guard>} />
+              <Route path="/bk/cerita" element={<Guard roles={["bk"]}>{S(<CounselorStories />)}</Guard>} />
 
               <Route path="/admin" element={<Guard roles={["admin"]}>{S(<Import />)}</Guard>} />
               <Route path="/admin/pengguna" element={<Guard roles={["admin"]}>{S(<UsersPage />)}</Guard>} />
+              <Route path="/admin/kode" element={<Guard roles={["admin"]}>{S(<Codes />)}</Guard>} />
               <Route path="/admin/aturan" element={<Guard roles={["admin"]}>{S(<Rules />)}</Guard>} />
               <Route path="/admin/sumber-daya" element={<Guard roles={["admin"]}>{S(<Resources />)}</Guard>} />
               <Route path="/admin/log" element={<Guard roles={["admin"]}>{S(<AuditLog />)}</Guard>} />
