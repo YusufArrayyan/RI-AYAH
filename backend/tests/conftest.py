@@ -6,7 +6,8 @@ from pathlib import Path
 import pytest
 
 _tmp = Path(tempfile.mkdtemp()) / "test.db"
-os.environ["RIAYAH_DATABASE_URL"] = f"sqlite:///{_tmp.as_posix()}"
+# RIAYAH_TEST_DATABASE_URL=postgresql://... menjalankan seluruh uji di Postgres.
+os.environ["RIAYAH_DATABASE_URL"] = os.environ.get("RIAYAH_TEST_DATABASE_URL") or f"sqlite:///{_tmp.as_posix()}"
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402

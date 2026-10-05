@@ -244,6 +244,32 @@ def imports(user: User = Depends(admin_only), db: Session = Depends(get_db)):
     ]
 
 
+# ── Reset data demo ─────────────────────────────────────────────────────────
+
+
+@router.get("/demo-info")
+def demo_info(user: User = Depends(admin_only)):
+    from ..config import settings
+
+    return {"resettable": not settings.is_production, "persistent": settings.is_persistent_db}
+
+
+@router.post("/reset-demo")
+def reset_demo(user: User = Depends(admin_only), db: Session = Depends(get_db)):
+    """Kembalikan seluruh data ke SIMULASI awal. Tidak tersedia di produksi.
+
+    Menghapus semua akun yang didaftarkan, kasus, log audit, dan perubahan aturan.
+    """
+    from ..config import settings
+    from ..seed import reset_and_seed
+
+    if settings.is_production:
+        raise HTTPException(404)
+    db.close()
+    reset_and_seed()
+    return {"ok": True}
+
+
 # ── A2 Pengguna dan relasi ──────────────────────────────────────────────────
 
 ROLE_NAMES = {"siswa": "Siswa", "wali": "Wali", "guru": "Guru", "bk": "Guru BK", "admin": "Admin", "pimpinan": "Pimpinan", "komite": "Komite"}

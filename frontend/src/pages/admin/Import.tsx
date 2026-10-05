@@ -1,6 +1,8 @@
-import { CircleCheck, Download, FileSpreadsheet, Upload } from "lucide-react";
+import { CircleCheck, Download, FileSpreadsheet, RotateCcw, Upload } from "lucide-react";
 import { useState, type ChangeEvent } from "react";
-import { Banner, Button, ErrorState, LoadingBlock, PageHead, SeenPanel, SimTag, Steps, XaiBox } from "../../components/ui";
+import { Banner, Button, ConfirmDialog, ErrorState, LoadingBlock, PageHead, SeenPanel, SimTag, Steps, XaiBox } from "../../components/ui";
+import { useAuth } from "../../lib/auth";
+import { useNavigate } from "react-router-dom";
 import { api, download, useResource } from "../../lib/api";
 import { fmtDateTime } from "../../lib/format";
 import { useToast } from "../../lib/toast";
@@ -35,6 +37,23 @@ interface Job {
 export default function Import() {
   const fields = useResource<{ fields: Field[] }>("/api/admin/import/fields");
   const jobs = useResource<Job[]>("/api/admin/imports");
+  const demo = useResource<{ resettable: boolean; persistent: boolean }>("/api/admin/demo-info");
+  const { logout } = useAuth();
+  const navTo = useNavigate();
+  const [resetOpen, setResetOpen] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const doReset = async () => {
+    setResetting(true);
+    try {
+      await api("/api/admin/reset-demo", { method: "POST" });
+      logout();
+      navTo("/masuk", { replace: true, state: { notice: "Data demo sudah dikembalikan ke kondisi awal. Silakan masuk lagi." } });
+    } catch (e) {
+      setErr((e as Error).message);
+      setResetting(false);
+      setResetOpen(false);
+    }
+  };
   const toast = useToast();
   const [step, setStep] = useState(0);
   const [file, setFile] = useState<File | null>(null);
@@ -316,6 +335,29 @@ export default function Import() {
             </Button>
           </section>
         )}
+
+        {demo.data?.resettable && (
+          <section className="card stack" aria-labelledby="reset" style={{ gap: 10 }}>
+            <h2 id="reset">Data demo</h2>
+            <p className="small">
+              Kembalikan seluruh aplikasi ke data SIMULASI awal, misalnya sebelum penilaian juri.
+              {demo.data.persistent ? " Basis data ini permanen, jadi perubahan pengunjung sebelumnya tetap tersimpan sampai di-reset." : " Basis data ini sementara dan juga kembali ke awal saat server dimulai ulang."}
+            </p>
+            <Button variant="danger-ghost" icon={<RotateCcw aria-hidden />} onClick={() => setResetOpen(true)} style={{ alignSelf: "flex-start" }}>
+              Reset data demo
+            </Button>
+          </section>
+        )}
+        <ConfirmDialog
+          open={resetOpen}
+          title="Reset semua data demo?"
+          consequence="Semua akun yang didaftarkan, kasus, catatan, log audit, dan perubahan aturan dihapus, lalu data SIMULASI awal dibuat ulang. Semua pengguna perlu masuk lagi. Tindakan ini tidak bisa dibatalkan."
+          confirmLabel="Reset sekarang"
+          danger
+          loading={resetting}
+          onConfirm={doReset}
+          onCancel={() => setResetOpen(false)}
+        />
 
         <section className="section" aria-labelledby="riwayat">
           <h2 id="riwayat">Riwayat impor</h2>

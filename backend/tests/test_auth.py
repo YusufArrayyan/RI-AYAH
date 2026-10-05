@@ -120,3 +120,12 @@ def test_pesan_tanpa_wali_kelas_memakai_guru_bk(client, as_role, fresh_db):
     client.post("/api/admin/import/commit", headers=admin, files={"file": ("t.csv", csv.encode(), "text/csv")}, data={"mapping": json.dumps(prev["mapping"])})
     msg = client.get("/api/me/home", headers=h).json()["message"]
     assert msg and "None" not in msg["text"] and msg["from"] == "Guru BK"
+
+
+def test_reset_data_demo_menghapus_akun_terdaftar(client, as_role, fresh_db):
+    client.post("/api/auth/register", json={"role": "siswa", "name": "Akan Hilang", "email": "hilang@contoh.id", "password": PW, "nis": "HLG-1", "level": "kampus", "class_name": "Uji", "birth_date": "2004-01-01"})
+    assert client.post("/api/auth/login", json={"email": "hilang@contoh.id", "password": PW}).status_code == 200
+    assert client.post("/api/admin/reset-demo", headers=as_role("guru")).status_code == 403
+    assert client.post("/api/admin/reset-demo", headers=as_role("admin")).json()["ok"] is True
+    assert client.post("/api/auth/login", json={"email": "hilang@contoh.id", "password": PW}).status_code == 401
+    assert client.post("/api/auth/login", json={"email": "nadia@demo.riayah.id", "password": DEMO_PASSWORD}).status_code == 200

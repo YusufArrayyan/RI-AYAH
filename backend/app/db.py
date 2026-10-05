@@ -7,8 +7,15 @@ from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from .config import settings
 
-connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
-engine = create_engine(settings.database_url, connect_args=connect_args, future=True)
+_sqlite = settings.database_url.startswith("sqlite")
+engine = create_engine(
+    settings.database_url,
+    connect_args={"check_same_thread": False} if _sqlite else {},
+    # Postgres terkelola (Neon/Render) bisa memutus koneksi menganggur: cek dulu sebelum dipakai.
+    pool_pre_ping=not _sqlite,
+    pool_recycle=300 if not _sqlite else -1,
+    future=True,
+)
 
 if settings.database_url.startswith("sqlite"):
 
