@@ -38,7 +38,7 @@ TEACHER_GUIDE = {
         {"say": "“Sistem bilang kamu bermasalah.”", "why": "Memberi label dan menempatkan mesin sebagai hakim."},
         {"say": "“Nilai kamu turun terus, kenapa?”", "why": "Terdengar seperti teguran akademik."},
         {"say": "“Kamu harus ke BK.”", "why": "Perintah membuat siswa menutup diri."},
-        {"say": "Menyapa di depan teman sekelas.", "why": "Privasi siswa hilang; pilih tempat yang tenang."},
+        {"say": "Mengajak ngobrol di depan teman sekelas.", "why": "Privasi siswa hilang; pilih tempat yang tenang."},
     ],
     "after": [
         "Catat di Ri'ayah bahwa Anda sudah mengajak ngobrol. Cukup pilih hasilnya, jangan tulis isi cerita siswa.",

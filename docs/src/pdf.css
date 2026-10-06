@@ -415,3 +415,14 @@ tr.group td {
   font-size: 8pt;
   color: var(--mute);
 }
+
+.cover-brand {
+  display: flex;
+  align-items: center;
+  gap: 8pt;
+  flex: none;
+}
+.cover-brand img {
+  height: 46pt;
+  width: auto;
+}

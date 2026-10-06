@@ -172,7 +172,9 @@ export default function Codes() {
         {printable.map((r) => (
           <div key={r.id} className="code-card">
             <div className="code-card-head">
-              <strong>Ri'ayah</strong>
+              <strong style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <img src="/brand/logo.png" alt="" width={18} height={20} /> Ri'ayah
+              </strong>
               <span lang="ar">رعاية</span>
             </div>
             <p className="code-card-title">{kind === "aktivasi" ? "Kartu aktivasi akun siswa" : "Undangan untuk orang tua"}</p>

@@ -1,9 +1,9 @@
 /* Service worker minimal: menyimpan kerangka aplikasi agar layar bantuan tetap terbuka
  * saat offline (aturan wajib 14.3.5). Respons API TIDAK pernah disimpan di cache. */
-const CACHE = "riayah-shell-v1";
+const CACHE = "riayah-shell-v2";
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/", "/favicon.svg", "/manifest.webmanifest"])));
+  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/", "/favicon-32.png", "/brand/logo.png", "/manifest.webmanifest"])));
   self.skipWaiting();
 });
 

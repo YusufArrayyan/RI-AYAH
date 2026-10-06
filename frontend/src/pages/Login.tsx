@@ -10,9 +10,17 @@ export function AuthIntro() {
   return (
     <section className="login-intro">
       <div className="stack" style={{ gap: 18 }}>
-        <span className="big-ar" lang="ar" aria-hidden>
-          رعاية
-        </span>
+        <div className="brand-lockup">
+          <img src="/brand/logo.png" alt="Logo Ri'ayah" width={72} height={80} />
+          <div className="stack" style={{ gap: 0 }}>
+            <span className="brand-name" translate="no">
+              Ri'ayah
+            </span>
+            <span className="brand-ar" lang="ar">
+              رعاية
+            </span>
+          </div>
+        </div>
         <h1>Pintu yang membawa siswa ke manusia yang peduli.</h1>
         <p className="intro-copy">
           Ri'ayah membantu guru menyadari lebih awal saat seorang siswa mulai kesulitan, misalnya makin sering absen atau tugasnya menumpuk, lalu mengajaknya ngobrol sebelum masalahnya

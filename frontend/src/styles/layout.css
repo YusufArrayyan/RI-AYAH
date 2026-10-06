@@ -6,6 +6,14 @@
   text-decoration: none;
   color: var(--ink);
 }
+.wordmark {
+  align-items: center;
+}
+.wordmark .wm-logo {
+  flex: none;
+  height: auto;
+  align-self: center;
+}
 .wordmark .wm-latin {
   font-weight: 700;
   font-size: 20px;
@@ -936,4 +944,28 @@
     font-size: 8.5pt;
     color: #3d5560;
   }
+}
+
+/* ── Logo di halaman masuk ─────────────────────────────────────────────── */
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.brand-lockup img {
+  flex: none;
+  height: auto;
+}
+.brand-name {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.brand-ar {
+  font-family: var(--font-ar);
+  font-size: 34px;
+  line-height: 1.2;
+  color: var(--primary-dark);
 }

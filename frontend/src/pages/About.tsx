@@ -29,9 +29,12 @@ export default function About() {
         </Link>
 
         <header className="about-hero">
-          <span className="about-ar" lang="ar">
-            رعاية
-          </span>
+          <div className="stack" style={{ alignItems: "center", gap: 6 }}>
+            <img src="/brand/logo.png" alt="Logo Ri'ayah" width={88} height={98} />
+            <span className="about-ar" lang="ar">
+              رعاية
+            </span>
+          </div>
           <div className="stack" style={{ gap: 8 }}>
             <h1>Mengapa namanya Ri'ayah?</h1>
             <p className="about-lead">
@@ -46,6 +49,14 @@ export default function About() {
           <p>
             Dalam bahasa Arab sehari-hari, kata ini dipakai untuk layanan yang merawat manusia: <em>ri'āyah ṣiḥḥiyyah</em> berarti layanan kesehatan, dan <em>ri'āyah nafsiyyah</em> berarti
             pendampingan psikologis. Jadi nama ini bukan sekadar label. Ia menggambarkan apa yang ingin dilakukan aplikasi ini: <strong>merawat, bukan menilai</strong>.
+          </p>
+        </section>
+
+        <section className="about-section">
+          <h2>Arti logonya</h2>
+          <p>
+            Sosok dewasa merangkul sosok kecil: guru dan orang tua yang menjaga, bukan mengawasi. Keduanya tumbuh dari buku yang terbuka, seperti tunas: sekolah sebagai tempat tumbuh. Bintang kecil
+            adalah harapan yang dijaga bersama. Teal yang tenang adalah warna utama aplikasi, dan kuning hangat menandai siswa yang sedang didampingi.
           </p>
         </section>
 

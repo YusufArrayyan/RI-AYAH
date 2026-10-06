@@ -35,6 +35,7 @@ import { refreshContacts, useOnline } from "../lib/offline";
 export function Wordmark({ small, to = "/" }: { small?: boolean; to?: string }) {
   return (
     <Link to={to} className={`wordmark ${small ? "sm" : ""}`} aria-label="Ri'ayah, ke beranda" translate="no">
+      <img src="/brand/logo.png" alt="" className="wm-logo" width={small ? 24 : 30} height={small ? 27 : 33} />
       <span className="wm-latin">Ri'ayah</span>
       <span className="wm-ar" lang="ar" aria-hidden>
         رعاية
