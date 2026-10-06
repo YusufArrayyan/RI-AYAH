@@ -176,7 +176,7 @@ def home(user: User = Depends(student_only), db: Session = Depends(get_db)):
         "message": message,
         "has_red": bool(case and case.zone == "merah"),
         "objection_pending": bool(case and case.status == "ditinjau"),
-        "library": [{"id": i.id, "title": i.title, "kind": i.kind, "label": i.label, "minutes": i.minutes, "category": i.category} for i in picks],
+        "library": [{"id": i.id, "title": i.title, "kind": i.kind, "label": i.label, "minutes": i.minutes, "category": i.category, "dalil_count": len(i.dalil or [])} for i in picks],
     }
 
 

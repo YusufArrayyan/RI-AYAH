@@ -1,6 +1,19 @@
+import { ExternalLink } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { PageHead, ErrorState, LoadingBlock } from "../../components/ui";
 import { useResource } from "../../lib/api";
+
+interface Dalil {
+  jenis: "ayat" | "hadis";
+  arab: string;
+  latin: string | null;
+  terjemah: string;
+  rujukan: string;
+  derajat: string | null;
+  sumber: string;
+  url: string;
+  pelajaran: string[];
+}
 
 interface Item {
   id: number;
@@ -13,6 +26,39 @@ interface Item {
   summary: string;
   body: string;
   reviewed_by: string | null;
+  dalil: Dalil[];
+}
+
+function DalilCard({ d }: { d: Dalil }) {
+  const hadis = d.jenis === "hadis";
+  return (
+    <li className={`card dalil${hadis ? " hadis" : ""}`}>
+      <div className="row">
+        <span className={`chip ${hadis ? "chip-xai" : "chip-info"}`}>{hadis ? "Hadis" : "Al-Qur'an"}</span>
+        <span className="strong">{d.rujukan}</span>
+        {d.derajat && <span className="chip chip-ok">{d.derajat}</span>}
+      </div>
+      <p className="dalil-ar" lang="ar" dir="rtl">
+        {d.arab}
+      </p>
+      {d.latin && <p className="dalil-latin">{d.latin}</p>}
+      <p className="dalil-tr">{hadis ? d.terjemah : `“${d.terjemah}”`}</p>
+      {d.pelajaran.length > 0 && (
+        <div className="dalil-lessons">
+          <span className="strong">Anjuran dan pelajaran dari hadis ini</span>
+          <ul>
+            {d.pelajaran.map((p, i) => (
+              <li key={i}>{p}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <a className="caption dalil-src" href={d.url} target="_blank" rel="noopener noreferrer">
+        Sumber: {d.sumber} <ExternalLink aria-hidden />
+        <span className="sr-only">(buka di tab baru)</span>
+      </a>
+    </li>
+  );
 }
 
 export default function LibraryItem() {
@@ -40,6 +86,25 @@ export default function LibraryItem() {
         Sumber: {data.source}
         {data.reviewed_by ? ` · Ditinjau ${data.reviewed_by}` : ""}
       </p>
+
+      {data.dalil.length > 0 && (
+        <section className="section stack" style={{ gap: 12 }} aria-labelledby="dalil-title">
+          <div>
+            <h2 id="dalil-title" style={{ fontSize: 20 }}>
+              Dalil dan anjuran Islam
+            </h2>
+            <p className="muted" style={{ maxWidth: "65ch" }}>
+              Ayat dan hadis dikutip apa adanya dari Al-Qur'an dan Terjemahan Kemenag RI serta Ensiklopedia Hadis Terjemahan (HadeethEnc.com). Ketuk tautan sumber untuk membaca
+              teks lengkap dan penjelasannya.
+            </p>
+          </div>
+          <ul className="dalil-list" role="list">
+            {data.dalil.map((d, i) => (
+              <DalilCard key={i} d={d} />
+            ))}
+          </ul>
+        </section>
+      )}
     </article>
   );
 }

@@ -13,8 +13,9 @@ import random
 import secrets
 import sys
 from datetime import date, timedelta
+from pathlib import Path
 
-from sqlalchemy import select
+from sqlalchemy import inspect, select, text
 from sqlalchemy.orm import Session
 
 from . import audit, rules
@@ -491,12 +492,12 @@ def seed(db: Session) -> None:
         ("Memecah tugas besar jadi langkah kecil", "latihan", "Belajar", "Mandiri", 5, "Cara sederhana agar tugas yang menumpuk terasa bisa dikerjakan.", "Tulis semua tugas di satu kertas. Untuk setiap tugas, tulis satu langkah pertama yang bisa selesai dalam 15 menit. Kerjakan satu langkah saja hari ini.\n\nTugas terlambat bukan tanda kamu malas. Sering kali itu tanda bebanmu sedang banyak. Wali kelasmu bisa membantu mengatur ulang tenggat."),
         ("Kalau merasa sendirian di keramaian", "bacaan", "Teman dan keluarga", "Mandiri", 4, "Perasaan sendiri itu umum. Ini beberapa cara kecil untuk terhubung lagi.", "Merasa sendiri bisa terjadi walau kita dikelilingi banyak orang. Mulailah dari satu orang: kirim pesan singkat ke teman lama, atau duduk di dekat teman sekelas saat istirahat.\n\nKamu tidak harus langsung bercerita panjang. Hadir bersama orang lain sudah merupakan langkah."),
         ("Mengenal layanan BK di sekolah", "info", "Layanan", "Info layanan", 2, "Apa yang terjadi saat kamu datang ke BK, dan apa yang tetap rahasia.", "Guru BK mendengarkan tanpa menghakimi. Ceritamu tidak dicatat di rapor dan tidak memengaruhi nilai.\n\nKamu boleh datang sendiri atau bersama teman. Ruang BK buka Senin sampai Jumat pada jam sekolah. Kalau di luar jam itu kamu merasa tidak aman, tekan tombol Butuh bantuan sekarang."),
-        ("Menenangkan hati dengan dzikir (pilihan)", "audio", "Spiritual (pilihan)", "Mandiri", 5, "Bagi yang ingin, panduan dzikir singkat untuk menenangkan diri. Sepenuhnya pilihan.", "Konten ini pilihan dan tidak terkait dengan penandaan apa pun. Disusun bersama dosen studi Islam dan psikolog sekolah.\n\nDuduk tenang, atur napas, lalu ulangi dzikir yang biasa kamu baca dengan pelan. Bila pikiran melayang, kembalikan perhatian ke napas tanpa menyalahkan diri. (Teks dan rujukan sedang ditinjau sebelum terbit penuh.)"),
+        ("Menenangkan hati dengan dzikir (pilihan)", "audio", "Spiritual (pilihan)", "Mandiri", 5, "Bagi yang ingin, panduan dzikir singkat untuk menenangkan diri. Sepenuhnya pilihan.", "Konten ini pilihan dan tidak terkait dengan penandaan apa pun. Disusun bersama dosen studi Islam dan psikolog sekolah.\n\nDuduk tenang, atur napas, lalu ulangi dzikir yang biasa kamu baca dengan pelan. Bila pikiran melayang, kembalikan perhatian ke napas tanpa menyalahkan diri. Dalil dan rujukannya ada di bawah bacaan ini."),
         ("Saat nilai turun: bicara dengan guru", "bacaan", "Belajar", "Mandiri", 3, "Kalimat pembuka untuk menemui guru mata pelajaran tanpa canggung.", "Guru umumnya senang bila siswa datang lebih dulu. Coba: “Bu, saya kesulitan di bab ini. Boleh saya tanya bagian yang belum paham?”\n\nDatanglah di jam istirahat atau setelah kelas, bukan di depan seluruh kelas."),
         ("Mengenali tanda tubuh saat cemas", "bacaan", "Perasaan", "Mandiri", 3, "Jantung berdebar, perut tidak nyaman, sulit fokus: ini cara tubuh memberi tahu.", "Cemas adalah respons tubuh yang wajar. Tandanya bisa berupa jantung berdebar, tangan dingin, atau sulit berkonsentrasi.\n\nMenamai perasaan (“aku sedang cemas”) sudah membantu menurunkannya. Bila cemas terasa terus-menerus selama berminggu-minggu, bicarakan dengan guru BK."),
     ]
     for title, kind, cat, label, mins, summary, body in lib:
-        db.add(LibraryItem(title=title, kind=kind, category=cat, source="Tim BK Sekolah Terpadu Nusantara (SIMULASI)", label=label, status="terbit", minutes=mins, summary=summary, body=body, reviewed_by="Bu Maya, S.Psi."))
+        db.add(LibraryItem(title=title, kind=kind, category=cat, source="Tim BK Sekolah Terpadu Nusantara (SIMULASI)", label=label, status="terbit", minutes=mins, summary=summary, body=body, reviewed_by="Bu Maya, S.Psi.", dalil=DALIL.get(title)))
     db.add(LibraryItem(title="Mengatur waktu bermain gim", kind="bacaan", category="Belajar", source="Draf tim BK", label="Mandiri", status="draf", minutes=4, summary="Draf: menyeimbangkan gim dan belajar.", body="Draf belum ditinjau."))
     db.add(LibraryItem(title="Jadwal konseling kelompok semester ini", kind="info", category="Layanan", source="Draf tim BK", label="Info layanan", status="draf", minutes=2, summary="Draf jadwal konseling kelompok.", body="Draf belum ditinjau."))
 
@@ -515,6 +516,29 @@ def seed(db: Session) -> None:
     run_xai_tests(db)
 
 
+# Dalil per judul bacaan, diunduh dari equran.id (Kemenag RI) dan HadeethEnc.com oleh
+# scripts/ambil_dalil.py. Tidak ditulis tangan agar teks Arab dan terjemahannya sesuai sumber.
+DALIL: dict[str, list[dict]] = json.loads((Path(__file__).parent / "data" / "dalil.json").read_text(encoding="utf-8"))
+
+
+def _upgrade_schema() -> None:
+    """create_all tidak menambah kolom pada tabel lama (Postgres permanen di Render)."""
+    cols = {c["name"] for c in inspect(engine).get_columns("library_item")}
+    if "dalil" not in cols:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE library_item ADD COLUMN dalil JSON"))
+
+
+def _backfill_dalil(db: Session) -> None:
+    changed = False
+    for item in db.scalars(select(LibraryItem).where(LibraryItem.title.in_(DALIL.keys()))):
+        if not item.dalil:
+            item.dalil = DALIL[item.title]
+            changed = True
+    if changed:
+        db.commit()
+
+
 def reset_and_seed() -> None:
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
@@ -524,9 +548,12 @@ def reset_and_seed() -> None:
 
 def ensure_seeded() -> None:
     Base.metadata.create_all(engine)
+    _upgrade_schema()
     with SessionLocal() as db:
         if db.scalar(select(Institution.id)) is None:
             seed(db)
+        else:
+            _backfill_dalil(db)
 
 
 if __name__ == "__main__":

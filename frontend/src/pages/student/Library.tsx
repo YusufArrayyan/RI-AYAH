@@ -32,7 +32,7 @@ export default function Library() {
   return (
     <>
       <h1>{child ? "Bacaan" : "Bacaan dan latihan"}</h1>
-      <p className="muted">Bacaan dan latihan singkat yang ditinjau guru BK. Semua bersifat pilihan.</p>
+      <p className="muted">Bacaan dan latihan singkat yang ditinjau guru BK, dilengkapi dalil Al-Qur'an dan hadis beserta sumbernya. Semua bersifat pilihan.</p>
 
       <div className="search">
         <Search aria-hidden />

@@ -89,6 +89,7 @@ def library(q: str = "", category: str = "", user: User = Depends(current_user),
                 "label": i.label,
                 "minutes": i.minutes,
                 "summary": i.summary,
+                "dalil_count": len(i.dalil or []),
             }
             for i in items
         ],
@@ -111,4 +112,5 @@ def library_item(item_id: int, user: User = Depends(current_user), db: Session =
         "summary": i.summary,
         "body": i.body,
         "reviewed_by": i.reviewed_by,
+        "dalil": i.dalil or [],
     }

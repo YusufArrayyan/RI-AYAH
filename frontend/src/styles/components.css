@@ -1041,3 +1041,64 @@ dialog.dialog[open] {
   font-size: 12.5px;
   color: var(--mute);
 }
+
+/* ── Dalil dan anjuran (pustaka) ─────────────────────────────────────────── */
+.dalil-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+.dalil {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  border-inline-start: 4px solid var(--primary);
+}
+.dalil.hadis {
+  border-inline-start-color: var(--xai);
+}
+.dalil-ar {
+  font-family: var(--font-ar);
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 2.1;
+  color: var(--ink);
+  text-align: right;
+}
+.dalil-latin {
+  font-style: italic;
+  color: var(--mute);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.dalil-tr {
+  font-size: 17px;
+  line-height: 1.65;
+  max-width: 65ch;
+}
+.dalil-lessons {
+  background: var(--panel);
+  border-radius: var(--radius-control);
+  padding: var(--s3) var(--s4);
+}
+.dalil-lessons ul {
+  margin: var(--s2) 0 0;
+  padding-inline-start: 1.2em;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+.dalil-src {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.dalil-src svg {
+  width: 14px;
+  height: 14px;
+}
+@media (max-width: 480px) {
+  .dalil-ar {
+    font-size: 22px;
+  }
+}

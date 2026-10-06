@@ -319,6 +319,9 @@ class LibraryItem(Base):
     summary: Mapped[str] = mapped_column(Text)
     body: Mapped[str] = mapped_column(Text)
     reviewed_by: Mapped[str | None] = mapped_column(String(120))
+    # Dalil dan anjuran Islam yang dikutip apa adanya dari sumber daring (lihat scripts/ambil_dalil.py):
+    # [{jenis, arab, latin, terjemah, rujukan, derajat, sumber, url, pelajaran[]}]
+    dalil: Mapped[list | None] = mapped_column(JSON)
 
 
 class ServiceHours(Base):

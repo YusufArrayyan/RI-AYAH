@@ -16,7 +16,7 @@ export interface HomeData {
   message: { case_id: number; from: string; text: string } | null;
   has_red: boolean;
   objection_pending: boolean;
-  library: { id: number; title: string; kind: string; label: string; minutes: number; category: string }[];
+  library: { id: number; title: string; kind: string; label: string; minutes: number; category: string; dalil_count?: number }[];
 }
 
 const KIND_ICON: Record<string, typeof BookOpen> = { bacaan: BookOpen, latihan: Sparkles, audio: Headphones, info: Info };
@@ -34,6 +34,7 @@ export function LibraryCard({ item }: { item: HomeData["library"][number] }) {
         </span>
         <span className="caption">
           {item.label} · {item.minutes} menit
+          {item.dalil_count ? ` · ${item.dalil_count} dalil` : ""}
         </span>
       </span>
       <ChevronRight aria-hidden style={{ width: 20, height: 20, color: "var(--mute)" }} />

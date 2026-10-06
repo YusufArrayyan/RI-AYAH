@@ -1,6 +1,7 @@
 import "@fontsource-variable/atkinson-hyperlegible-next";
 import "@fontsource/baloo-2/latin-600.css";
 import "@fontsource/baloo-2/latin-700.css";
+import "@fontsource/amiri/arabic-400.css";
 import "@fontsource/amiri/arabic-700.css";
 import "@fontsource/ibm-plex-mono/latin-500.css";
 import "./styles/tokens.css";
